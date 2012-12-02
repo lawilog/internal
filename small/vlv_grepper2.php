@@ -6,6 +6,7 @@ $TABLE_NAME = 'vlv_ws10';
 
 mysql_connect('localhost', 'vlv');
 mysql_select_db('vlv');
+mysql_set_charset('utf8');
 mysql_query('DROP TABLE IF EXISTS '.$TABLE_NAME);
 mysql_query('CREATE TABLE '.$TABLE_NAME.' (id INT PRIMARY KEY AUTO_INCREMENT, fach TEXT, typ TEXT, dozent TEXT, wtag VARCHAR(16), zeitraum TEXT, uhrzeit VARCHAR(32), raum TEXT, zielgruppe TEXT, update_time VARCHAR(16))');
 
