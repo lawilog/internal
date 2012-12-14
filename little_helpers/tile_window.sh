@@ -13,8 +13,8 @@ case $deskDim in
 	;;
 	
 	*)
-		deskW=$( echo $desktop_dim | sed 's/x/ /' | awk '{print $1}' )
-		deskH=$( echo $desktop_dim | sed 's/x/ /' | awk '{print $2}' )
+		deskW=$( echo $deskDim | sed 's/x/ /' | awk '{print $1}' )
+		deskH=$( echo $deskDim | sed 's/x/ /' | awk '{print $2}' )
 	;;
 esac
 
@@ -27,6 +27,8 @@ do
 done
 deskW=(${deskW[$screen]})
 deskH=(${deskH[$screen]})
+
+# echo "deskW = $deskW , deskH = $deskH"
 
 winW=$deskW
 winH=$deskH
@@ -49,8 +51,9 @@ case $pos in
 		winH=$(( $deskH / 2 ))
 	;;
 esac
-winW=$(( $winW - subW ))
-winH=$(( $winH - subH ))
+winW=$(( $winW - $subW ))
+winH=$(( $winH - $subH ))
 
 wmctrl -r :ACTIVE: -b remove,maximized_vert,maximized_horz
 wmctrl -r :ACTIVE: -e "0,$offsetX,$offsetY,$winW,$winH"
+
