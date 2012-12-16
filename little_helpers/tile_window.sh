@@ -1,5 +1,5 @@
 #!/bin/bash
-pos=$1            # left right top bottom
+pos=$1            # left right top bottom full
 screen=${2:-0}    # default 0, else 1, 2, ...
 
 subW=10
