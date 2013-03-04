@@ -58,8 +58,9 @@
       <property name="XF86AudioStop" type="string" value="clementine -s"/>
       <property name="XF86AudioPrev" type="string" value="clementine -r"/>
       <property name="XF86AudioNext" type="string" value="clementine -f"/>
-      <property name="&lt;Super&gt;s" type="string" value="xfce4-popup-applicationsmenu"/>
-      <property name="&lt;Super&gt;l" type="string" value="xfce4-popup-windowmenu"/>
+      <property name="&lt;Super&gt;s" type="string" value="xfce4-popup-applicationsmenu -p"/>
+      <property name="&lt;Super&gt;l" type="string" value="xfce4-popup-windowmenu -p"/>
+      <property name="&lt;Super&gt;m" type="string" value="/home/lawilog/proggen/little_helpers/mem_usage_per_program_disp.sh"/>
     </property>
   </property>
   <property name="xfwm4" type="empty">
