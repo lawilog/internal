@@ -6,21 +6,22 @@
 
 namespace LW {
 
-template<typename numbertype, template <typename> class distribution>
+template<typename number_type, template <typename> class distribution_type>
 class RandDistrib
 {
 	private:
 		std::random_device rand_dev;
 		std::default_random_engine generator;
-		distribution<numbertype> distrib;
 		
 	public:
-		template<typename... Params>
-		RandDistrib(Params... parameters) : rand_dev(), generator(rand_dev()), distrib(parameters...) {}
+		distribution_type<number_type> F;
 		
-		numbertype operator() ()
+		template<typename... Params>
+		RandDistrib(Params... parameters) : rand_dev(), generator(rand_dev()), F(parameters...) {}
+		
+		number_type operator() ()
 		{
-			return distrib(generator);
+			return F(generator);
 		}
 };
 

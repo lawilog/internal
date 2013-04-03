@@ -39,3 +39,6 @@ add_executable(TableFile_testcase
 add_executable(parse_testcase
 	parse_testcase.cpp
 )
+add_executable(RandDistrib_testcase
+	RandDistrib_testcase.cpp
+)
