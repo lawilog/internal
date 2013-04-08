@@ -3,7 +3,11 @@
 
 struct double3
 {
-	double r[3];
+	union
+	{
+		struct {double x, y, z;}; 
+		double r[3];
+	};
 	
 	double3() {}
 	
@@ -14,11 +18,11 @@ struct double3
 		r[2] = v[2];
 	}
 	
-	double3(const double& x, const double& y, const double& z)
+	double3(const double& _x, const double& _y, const double& _z)
 	{
-		r[0] = x;
-		r[1] = y;
-		r[2] = z;
+		r[0] = _x;
+		r[1] = _y;
+		r[2] = _z;
 	}
 	
 	double& operator[](unsigned n)
