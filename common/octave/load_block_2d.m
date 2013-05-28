@@ -1,6 +1,6 @@
 function [data, x, y] = load_block_2d(filepath)
 
-	B = sortrows(load(filepath), [1,2,3]);
+	B = sortrows(load(filepath), [1,2]);
 	x = unique(B(:,1));
 	y = unique(B(:,2));
 	
@@ -8,9 +8,9 @@ function [data, x, y] = load_block_2d(filepath)
 	nx = length(x);
 	ny = length(y);
 	if nx * ny ~= nxy
-		printf('ERROR: Found %i rows, but dims are %i by %i\n', nxyz, nx, ny);
+		printf('ERROR: Found %i rows, but dims are %i by %i\n', nxy, nx, ny);
 		error('ERROR: Data is not on grid.');
-	endif
+	end
 	
 	if m == 3
 		data = zeros(nx, ny);
