@@ -30,15 +30,21 @@ add_executable(implode_explode_testcase
 	implode_explode.cpp
 )
 
+add_executable(explode_parse_testcase
+	explode_parse_testcase.cpp
+	implode_explode.cpp
+)
+
 add_executable(TableFile_testcase
 	TableFile_testcase.cpp
 	TableFile.cpp
 	LineArray.cpp
 )
 
-add_executable(parse_testcase
-	parse_testcase.cpp
-)
-add_executable(RandDistrib_testcase
-	RandDistrib_testcase.cpp
-)
+# add_executable(buffer_test buffer_test.cpp)
+add_executable(cout_vector_test cout_vector_test.cpp)
+add_executable(parse_testcase parse_testcase.cpp)
+add_executable(RandDistrib_testcase RandDistrib_testcase.cpp)
+add_executable(stringprintf stringprintf.cpp)
+
+

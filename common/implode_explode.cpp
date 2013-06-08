@@ -1,6 +1,8 @@
 #include "implode_explode.h"
 using namespace std;
 
+namespace LW {
+
 string implode(const string& delim, const vector<string>& vstr)
 {
 	if(vstr.empty())
@@ -35,4 +37,6 @@ vector<string> explode(const string& delim, const string& str)
 		else pos_beg = pos_end + delim.length();
 	}
 	return v;
+}
+
 }

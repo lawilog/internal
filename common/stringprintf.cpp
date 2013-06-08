@@ -1,33 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "printf++.hpp"
 using namespace std;
-
-template<typename... Args>
-string strprintf(const char* format, const Args&... args)
-{
-	const int static_len = 1024;
-	char static_buffer[static_len]; // in static memory
-	char* buffer = & static_buffer[0];
-	int len = snprintf(buffer, static_len, format, args...);
-	if(len < 0) return string(); // on error, return empty string
-	if(len >= static_len) // we need more space
-	{
-		buffer = new char[len]; // allocate on heap
-		sprintf(buffer, format, args...);
-		string str(buffer, len);
-		delete [] buffer;
-		return str;
-	}
-	else return string(buffer, len); // everything went fine
-}
-
-template<typename... Args>
-int fprintf(ostream& out_stream, const char* format, const Args&... args)
-{
-	string buffer = strprintf(format, args...);
-	out_stream.write(buffer.c_str(), buffer.length());
-}
+using namespace LW;
 
 void wout() {}
 

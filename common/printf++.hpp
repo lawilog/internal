@@ -3,25 +3,25 @@
 
 #include <fstream>
 #include <string>
-using namespace std;
+
+namespace LW {
 
 template<typename... Args>
 std::string strprintf(const char* format, const Args&... args)
 {
 	const int static_len = 1024;
 	char static_buffer[static_len]; // in static memory
-	char* buffer = & static_buffer[0];
-	int len = snprintf(buffer, static_len, format, args...);
-	if(len < 0) return string(); // on error, return empty string
+	int len = snprintf(static_buffer, static_len, format, args...);
+	if(len < 0) return std::string(); // on error, return empty string
 	if(len >= static_len) // we need more space
 	{
-		buffer = new char[len]; // allocate on heap
+		char* buffer = new char[len]; // allocate on heap
 		sprintf(buffer, format, args...);
 		std::string str(buffer, len);
 		delete [] buffer;
 		return str;
 	}
-	else return std::string(buffer, len); // everything went fine
+	else return std::string(static_buffer, len); // everything went fine
 }
 
 template<typename... Args>
@@ -29,6 +29,8 @@ void fprintf(std::ostream& out_stream, const char* format, const Args&... args)
 {
 	std::string buffer = strprintf(format, args...);
 	out_stream.write(buffer.c_str(), buffer.length());
+}
+
 }
 
 #endif // _LW_PRINTFPP_
