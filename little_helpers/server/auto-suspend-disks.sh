@@ -2,11 +2,11 @@
 # This will automatically suspend /dev/sd* disks, when there
 # was no I/O activity for (CHECK_INTERVAL * COUNT) seconds.
 # Make sure that iostat and hdparm are installed.
-CHECK_INTERVAL=15
-COUNT=4
+CHECK_INTERVAL=600
+COUNT=6
 devs=( $(ls /dev/sd?) )
 declare -A counts
-iostat -d 15 ${devs[@]} | while read dev tps R
+iostat -d $CHECK_INTERVAL ${devs[@]} | while read dev tps R
 do
 	test "${dev:0:2}" = "sd" || continue
 	if [ "$tps" = "0,00" ]
