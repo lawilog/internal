@@ -4,18 +4,23 @@
 # Make sure that iostat and hdparm are installed.
 CHECK_INTERVAL=600
 COUNT=6
-devs=( $(ls /dev/sd?) )
+
 declare -A counts
-iostat -d $CHECK_INTERVAL ${devs[@]} | while read dev tps R
+iostat -d $CHECK_INTERVAL $(ls /dev/sd?) | while read dev tps R
 do
 	test "${dev:0:2}" = "sd" || continue
 	if [ "$tps" = "0,00" ]
 	then
+		# echo "$dev was idle"
+		test -z "${counts[$dev]}" && counts[$dev]=0
+		if [ ${counts[$dev]} -eq $COUNT ]
+		then
+			logger Suspending idle $dev
+			hdparm -y /dev/$dev
+		fi
 		counts[$dev]=$(( ${counts[$dev]} + 1 ))
-		# echo "$dev was idle, ${counts[$dev]}"
-		test ${counts[$dev]} -eq $COUNT && hdparm -y /dev/$dev
 	else
+		# echo "$dev was busy"
 		counts[$dev]=0
-		# echo "$dev was busy, ${counts[$dev]}"
 	fi
 done
