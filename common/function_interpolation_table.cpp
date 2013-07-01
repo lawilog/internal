@@ -13,31 +13,30 @@ template<interpol_method method, typename xtype=double, typename ytype=double>
 class FunInterpolTable
 {
 	typedef typename map<xtype,ytype>::iterator point_iter;
+	
 	private:
-		map<xtype,ytype> points; // store actually calculated (not interpolated) values
+		map<xtype,ytype> points; // store actually calculated (not interpolated) points
 		ytype(*fun)(xtype); // pointer to expansive function
 		xtype xperc;
 		//ytype yperc;
 		unsigned call_count;
 		unsigned eval_count;
 		
-		ytype eval(const xtype& x)
+		double dist(const xtype& x0, const xtype& x1) const
 		{
-			++eval_count;
-			ytype y = fun(x);
-			points.insert( pair<xtype,ytype>(x, y) );
-			return y;
+			double d = x1 - x0;
+			return (d<0?-d:d);
 		}
 		
 		ytype interpol_linear(const xtype& x0, const ytype& y0, const xtype& x1, const ytype& y1, const xtype& xi) const
 		{
-			return 0;
+			return y1 + (xi - x1) * (y1 - y0) / (x1 - x0);
 		}
 		
-		ytype interpol_quadratic(const xtype& x0, const ytype& y0, const xtype& x1, const ytype& y1, const xtype& x2, const ytype& y2, const xtype& xi) const
+		/* ytype interpol_quadratic(const xtype& x0, const ytype& y0, const xtype& x1, const ytype& y1, const xtype& x2, const ytype& y2, const xtype& xi) const
 		{
 			return 0;
-		}
+		} */
 		
 	public:
 		FunInterpolTable( ytype(*_fun)(xtype))
@@ -45,6 +44,16 @@ class FunInterpolTable
 			fun = _fun;
 			xperc = 1e-2;
 			//yperc = 0;
+			call_count = 0;
+			eval_count = 0;
+		}
+		
+		ytype eval(const xtype& x)
+		{
+			++eval_count;
+			ytype y = fun(x);
+			points.insert( pair<xtype,ytype>(x, y) );
+			return y;
 		}
 		
 		void precompute(xtype start, xtype end, unsigned npoints)
@@ -62,6 +71,7 @@ class FunInterpolTable
 		// set x percision:
 		// calculate new value if neighbor positions are farer apart than xperc
 		// if xperc is 0, always interpolate -> usefull in conjunction with precompute()
+		// you may also switch off evaulation at any time with setXPerc(0)
 		void setXPerc(xtype xperc)
 		{
 			this->xperc = xperc;
@@ -76,8 +86,8 @@ class FunInterpolTable
 			{
 				case closest: points_needed = 1; break;
 				case linear:  points_needed = 2; break;
-				default: static_assert(true, "Interpolation method not yet implemented.");
 			}
+			static_assert(method==closest || method==linear, "Interpolation method not yet implemented.");
 			
 			// search points for the first position which is equal or greater than x
 			point_iter geq = points.lower_bound(x);
@@ -95,9 +105,8 @@ class FunInterpolTable
 			switch(method)
 			{
 				case closest:
-				case linear:
 				{
-					typename map<xtype,ytype>::iterator closest_point;
+					point_iter closest_point;
 					if(geq == points.end()) // x is greater than all previously calculated positions
 					{
 						closest_point = points.end();
@@ -109,31 +118,44 @@ class FunInterpolTable
 					{
 						point_iter low = geq;
 						--low; // geq is on right, get next point on the left
-						closest_point = (x - low->first < geq->first - x) ? low : geq; // choose closer point
+						closest_point = (dist(x, low->first) < dist(x, geq->first)) ? low : geq; // choose closer point
 					}
-					if(xperc == 0) // asked to always interpolate
+					if(	xperc == 0 // asked to always interpolate
+						||
+						dist(x, closest_point->first) <= xperc // closest point is close enough
+					) 
 						return closest_point->second;
-					else
-					{
-						xtype distance = x - closest_point->first;
-						if(distance < 0)
-							distance = -distance;
-						if(distance <= xperc) // closest point is close enough
-							return closest_point->second;
-						// else eval
-					}
+					// else eval
 					break;
 				}
 				
-				/*case linear:
+				case linear:
 				{
-					map<xtype,ytype>::iterator end0 = value.end();
-					map<xtype,ytype>::iterator end1 = end0 - 1;
-					if(x - end1->first <= xperc) // interpolate, if last-but-one point is not far away
-						return interpol_linear(end0->first, end0->second, end1->first, end1->second, x);
-				}*/
+					point_iter p0, p1;
+					if(geq == points.end()) // x is greater than all previously calculated positions
+					{
+						p0 = points.end(); --p0;
+						p1 = p0--;
+					}
+					else if(geq == points.begin()) // x is smaller than all previously calculated positions
+					{
+						p1 = points.begin();
+						p0 = p1++;
+					}
+					else // x is somewhere in the middle
+					{
+						p0 = geq;
+						p1 = p0--;
+					}
+					if(	xperc == 0 // asked to always interpolate
+						||
+						(dist(x, p0->first) <= xperc && dist(x, p1->first) <= xperc) // both closest points are close enough
+					)
+						return interpol_linear(p0->first, p0->second, p1->first, p1->second, x);
+					break;
+				}
 				
-				default: static_assert(true, "Interpolation method not yet implemented.");
+				// default: static_assert(false, "Interpolation method not yet implemented.");
 			}
 			
 			return eval(x);
@@ -147,7 +169,7 @@ class FunInterpolTable
 int main()
 {
 	RandDistrib<double,uniform_real_distribution> randuni(0, 2*M_PI);
-	RandDistrib<int,uniform_int_distribution> randi(0, 9);
+	RandDistrib<int,uniform_int_distribution> randi(0, 6);
 	ofstream d0("function_interpolation_table_f0.dat"); if(! d0) {cerr<<"Could not write file."<<endl; return 1;}
 	ofstream d1("function_interpolation_table_f1.dat"); if(! d1) {cerr<<"Could not write file."<<endl; return 1;}
 	ofstream d2("function_interpolation_table_f2.dat"); if(! d2) {cerr<<"Could not write file."<<endl; return 1;}
@@ -156,7 +178,7 @@ int main()
 	
 	// closest
 	FunInterpolTable<closest> f0(sin);
-	for(unsigned i = 0; i < 100; ++i)
+	for(unsigned i = 0; i < 1000; ++i)
 	{
 		double x = randuni();
 		d0<< x <<"\t"<< f0(x) <<"\t"<< sin(x) <<endl;
@@ -165,7 +187,7 @@ int main()
 	
 	// linear
 	FunInterpolTable<linear> f1(sin);
-	for(unsigned i = 0; i < 100; ++i)
+	for(unsigned i = 0; i < 1000; ++i)
 	{
 		double x = randuni();
 		d1<< x <<"\t"<< f1(x) <<"\t"<< sin(x) <<endl;
@@ -176,7 +198,7 @@ int main()
 	FunInterpolTable<closest> f2(sin);
 	f2.precompute(0, 2*M_PI, 50);
 	f2.setXPerc(0);
-	for(unsigned i = 0; i < 100; ++i)
+	for(unsigned i = 0; i < 1000; ++i)
 	{
 		double x = randuni();
 		d2<< x <<"\t"<< f2(x) <<"\t"<< sin(x) <<endl;
@@ -187,17 +209,17 @@ int main()
 	FunInterpolTable<linear> f3(sin);
 	f3.precompute(0, 2*M_PI, 50);
 	f3.setXPerc(0);
-	for(unsigned i = 0; i < 100; ++i)
+	for(unsigned i = 0; i < 1000; ++i)
 	{
 		double x = randuni();
 		d3<< x <<"\t"<< f3(x) <<"\t"<< sin(x) <<endl;
 	}
 	cout<<"f3, random, linear, precomputes: "<< f3.getCallCount() <<" calls, "<< f3.getEvalCount() <<" evals"<<endl;
 	
-	// cache 0 <= n <= 9 with integer n
-	FunInterpolTable<closest,int> f4(sin);
+	// cache 0 <= n <= 6 with integer n
+	FunInterpolTable<closest,float,float> f4(sin);
 	// f4.setXPerc(1);
-	for(unsigned i = 0; i < 100; ++i)
+	for(unsigned i = 0; i < 1000; ++i)
 	{
 		int x = randi();
 		d4<< x <<"\t"<< f4(x) <<"\t"<< sin(x) <<endl;
