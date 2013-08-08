@@ -25,7 +25,7 @@ template<class T> std::ostream& operator<<(std::ostream& os, const std::vector<T
 		for(auto p = v.begin() + 1; p != v.end(); ++p)
 			os << ' ' << *p;
 	}
-	os << '\n';
+	// os << '\n';
 	return os;
 }
 
