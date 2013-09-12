@@ -1,0 +1,8 @@
+
+ratprint: false$
+
+rhs_list(L) := map(lambda([_e], rhs(_e)), L)$
+lhs_list(L) := map(lambda([_e], lhs(_e)), L)$
+
+filter(L,cond,var) := sublist(L,lambda([_e],subst(_e,var,cond)))$
+
