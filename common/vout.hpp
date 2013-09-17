@@ -12,7 +12,7 @@ void vout(std::ostream& os, const std::vector<T>& v, const std::string& seperato
 	if(! v.empty())
 	{
 		os<< v.front();
-		for(auto p = v.begin() + 1; p != v.end(); ++p)
+		for(typename std::vector<T>::const_iterator p = v.begin() + 1; p != v.end(); ++p)
 			os << seperator << *p;
 	}
 }
@@ -22,7 +22,7 @@ template<class T> std::ostream& operator<<(std::ostream& os, const std::vector<T
 	if(! v.empty())
 	{
 		os<< v.front();
-		for(auto p = v.begin() + 1; p != v.end(); ++p)
+		for(typename std::vector<T>::const_iterator p = v.begin() + 1; p != v.end(); ++p)
 			os << ' ' << *p;
 	}
 	// os << '\n';
