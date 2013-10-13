@@ -41,9 +41,11 @@ add_executable(TableFile_testcase
 	LineArray.cpp
 )
 
+
 # add_executable(buffer_test buffer_test.cpp)
 add_executable(cout_vector_test cout_vector_test.cpp)
 add_executable(parse_testcase parse_testcase.cpp)
 add_executable(RandDistrib_testcase RandDistrib_testcase.cpp)
 add_executable(stringprintf stringprintf.cpp)
 add_executable(function_interpolation_table function_interpolation_table.cpp)
+add_executable(bytes2str_testcase bytes2str_testcase.cpp)
