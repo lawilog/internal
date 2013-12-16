@@ -8,17 +8,15 @@ class pateq
 	private:
 		unsigned nbits;
 		unsigned len;
+		unsigned cut;
 		vector<bool> ok;
 		
 	public:
 		pateq(unsigned _nbits) : nbits(_nbits)
 		{
-			len = 1;
-			for(unsigned k = 0; k < nbits; ++k) len *= 2;
-			
-			ok.resize(len);
-			for(unsigned i = 0; i < len; ++i)
-				ok[i] = true;
+			len = 1<<nbits;
+			ok = vector<bool>(len, true);
+			cut = ((unsigned)(-1)) >> (8*sizeof(unsigned)-nbits);
 		}
 		
 		void output(unsigned bitpat)
@@ -42,6 +40,11 @@ class pateq
 			return r;
 		}
 		
+		unsigned rot2(unsigned bitpat, unsigned shift)
+		{
+			return ( (bitpat<<shift) | (bitpat>>(nbits-shift)) ) & cut;
+		}
+		
 		unsigned rev(unsigned bitpat)
 		{
 			unsigned r = 0;
@@ -59,29 +62,16 @@ class pateq
 			{
 				if(ok[i])
 				{
-					//cout<<"# "; output(i);
 					unsigned r = rev(i);
-					if(r > i)
-					{
-						//cout<<"R "; output(r);
-						ok[r] = false;
-					}
+					if(r > i) ok[r] = false;
 					
 					for(unsigned s = 1; s < nbits; ++s)
 					{
-						unsigned j = rot(i, s);
-						if(j > i)
-						{
-							//cout<<"S "; output(j);
-							ok[j] = false;
-						}
+						unsigned j = ( (i<<s) | (i>>(nbits-s)) ) & cut; // rot2(i,s)
+						if(j > i) ok[j] = false;
 						
-						unsigned k = rot(r, s);
-						if(k > i)
-						{
-							//cout<<"T "; output(j);
-							ok[k] = false;
-						}
+						unsigned k = ( (r<<s) | (r>>(nbits-s)) ) & cut; // rot2(r, s)
+						if(k > i) ok[k] = false;
 					}
 				}
 			}
@@ -90,7 +80,20 @@ class pateq
 		void output_all()
 		{
 			for(unsigned i = 0; i < len; ++i)
-				if(ok[i]) output(i);
+			{
+				if(ok[i])
+				{
+					// output(i);
+					unsigned ii = i;
+					for(unsigned k = 0; k < nbits; ++k)
+					{
+						cout<< (ii%2?'1':'0');
+						ii /= 2;
+					}
+					cout<<'\n';
+				}
+			}
+			cout<<flush;
 		}
 };
 
