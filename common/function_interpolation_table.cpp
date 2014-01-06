@@ -6,7 +6,7 @@
 using namespace std;
 using namespace LW;
 
-enum interpol_method {closest, linear};
+enum interpol_method {closest, linear, quadratic};
 
 // xtype and ytype could be double or float
 template<interpol_method method, typename xtype=double, typename ytype=double>
@@ -33,16 +33,17 @@ class FunInterpolTable
 			return y1 + (xi - x1) * (y1 - y0) / (x1 - x0);
 		}
 		
-		/* ytype interpol_quadratic(const xtype& x0, const ytype& y0, const xtype& x1, const ytype& y1, const xtype& x2, const ytype& y2, const xtype& xi) const
+		ytype interpol_quadratic(const xtype& x0, const ytype& y0, const xtype& x1, const ytype& y1, const xtype& x2, const ytype& y2, const xtype& xi) const
 		{
-			return 0;
-		} */
+			// Lagrange interpolation
+			return y0 * (xi-x1)*(xi-x2)/( (x0-x1)*(x0-x2) )  +  y1 * (xi-x0)*(xi-x2)/( (x1-x0)*(x1-x2) )  +  y2 * (xi-x0)*(xi-x1)/( (x2-x0)*(x2-x1) );
+		}
 		
 	public:
 		FunInterpolTable( ytype(*_fun)(xtype))
 		{
 			fun = _fun;
-			xperc = 1e-2;
+			xperc = 1e-1;
 			//yperc = 0;
 			call_count = 0;
 			eval_count = 0;
@@ -86,8 +87,9 @@ class FunInterpolTable
 			{
 				case closest: points_needed = 1; break;
 				case linear:  points_needed = 2; break;
+				case quadratic: points_needed = 3; break;
 			}
-			static_assert(method==closest || method==linear, "Interpolation method not yet implemented.");
+			static_assert(method==closest || method==linear || method==quadratic, "Interpolation method not yet implemented.");
 			
 			// search points for the first position which is equal or greater than x
 			point_iter geq = points.lower_bound(x);
@@ -155,6 +157,48 @@ class FunInterpolTable
 					break;
 				}
 				
+				case quadratic:
+				{
+					point_iter p0, p1, p2;
+					if(geq == points.end()) // x is greater than all previously calculated positions
+					{
+						p0 = points.end(); --p0; // sorting afterwards: p0==last x
+						p2 = p0--; // sorting afterwards: p0 p2==last x
+						p1 = p0--; // sorting afterwards: p0 p1 p2==last x
+					}
+					else if(geq == points.begin()) // x is smaller than all previously calculated positions
+					{
+						p2 = points.begin(); // sorting afterwards: x p2==begin
+						p0 = p2++; // sorting afterwards: x p0==begin p2
+						p1 = p2++; // sorting afterwards: x p0==begin p1 p2
+					}
+					else // x is somewhere in the middle
+					{
+						p0 = geq;  // sorting afterwards: x p0
+						p2 = p0--; // sorting afterwards: p0 x p2
+						if(p0 == points.begin())
+							p1 = p2++; // sorting afterwards: p0==begin x p1 p2
+						else
+						{
+							p1 = p0--; // sorting afterwards: p0 p1 x p2
+							point_iter m = p2++; // sorting afterwards: p0 p1 x m p2
+							if( p2 == points.end() || dist(p0->first, p1->first) < dist(m->first, p2->first) ) // p0 is closer to [p1, m] interval
+								p2 = m;
+							else // p2 is closer to [p1, m] interval
+							{
+								p0 = p1;
+								p1 = m;
+							}
+						}
+					}
+					if(	xperc == 0 // asked to always interpolate
+						||
+						(dist(x, p0->first) <= xperc && dist(x, p1->first) <= xperc && dist(x, p2->first) <= xperc) // all three closest points are close enough
+					)
+						return interpol_quadratic(p0->first, p0->second, p1->first, p1->second, p2->first, p2->second, x);
+					break;
+				}
+				
 				// default: static_assert(false, "Interpolation method not yet implemented.");
 			}
 			
@@ -175,6 +219,7 @@ int main()
 	ofstream d2("function_interpolation_table_f2.dat"); if(! d2) {cerr<<"Could not write file."<<endl; return 1;}
 	ofstream d3("function_interpolation_table_f3.dat"); if(! d3) {cerr<<"Could not write file."<<endl; return 1;}
 	ofstream d4("function_interpolation_table_f4.dat"); if(! d4) {cerr<<"Could not write file."<<endl; return 1;}
+	ofstream d5("function_interpolation_table_f5.dat"); if(! d4) {cerr<<"Could not write file."<<endl; return 1;}
 	
 	// closest
 	FunInterpolTable<closest> f0(sin);
@@ -225,6 +270,16 @@ int main()
 		d4<< x <<"\t"<< f4(x) <<"\t"<< sin(x) <<endl;
 	}
 	cout<<"f4, cache: "<< f4.getCallCount() <<" calls, "<< f4.getEvalCount() <<" evals"<<endl;
+	
+	
+	// quadratic
+	FunInterpolTable<quadratic> f5(sin);
+	for(unsigned i = 0; i < 1000; ++i)
+	{
+		double x = randuni();
+		d5<< x <<"\t"<< f5(x) <<"\t"<< sin(x) <<endl;
+	}
+	cout<<"f5, random, quadratic: "<< f5.getCallCount() <<" calls, "<< f5.getEvalCount() <<" evals"<<endl;
 	
 	return 0;
 }
