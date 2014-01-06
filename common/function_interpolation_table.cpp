@@ -219,7 +219,7 @@ int main()
 	ofstream d2("function_interpolation_table_f2.dat"); if(! d2) {cerr<<"Could not write file."<<endl; return 1;}
 	ofstream d3("function_interpolation_table_f3.dat"); if(! d3) {cerr<<"Could not write file."<<endl; return 1;}
 	ofstream d4("function_interpolation_table_f4.dat"); if(! d4) {cerr<<"Could not write file."<<endl; return 1;}
-	ofstream d5("function_interpolation_table_f5.dat"); if(! d4) {cerr<<"Could not write file."<<endl; return 1;}
+	ofstream d5("function_interpolation_table_f5.dat"); if(! d5) {cerr<<"Could not write file."<<endl; return 1;}
 	
 	// closest
 	FunInterpolTable<closest> f0(sin);
