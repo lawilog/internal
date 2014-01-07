@@ -19,32 +19,6 @@ class pateq
 			cut = ((unsigned)(-1)) >> (8*sizeof(unsigned)-nbits);
 		}
 		
-		void output(unsigned bitpat)
-		{
-			for(unsigned k = 0; k < nbits; ++k)
-			{
-				cout<< (bitpat%2?'1':'0');
-				bitpat /= 2;
-			}
-			cout<<endl;
-		}
-		
-		unsigned rot(unsigned bitpat, unsigned shift)
-		{
-			unsigned r = 0;
-			for(unsigned k = 0; k < nbits; ++k)
-			{
-				r |= (bitpat%2) << ((k+shift)%nbits);
-				bitpat /= 2;
-			}
-			return r;
-		}
-		
-		unsigned rot2(unsigned bitpat, unsigned shift)
-		{
-			return ( (bitpat<<shift) | (bitpat>>(nbits-shift)) ) & cut;
-		}
-		
 		unsigned rev(unsigned bitpat)
 		{
 			unsigned r = 0;
@@ -83,7 +57,6 @@ class pateq
 			{
 				if(ok[i])
 				{
-					// output(i);
 					unsigned ii = i;
 					for(unsigned k = 0; k < nbits; ++k)
 					{

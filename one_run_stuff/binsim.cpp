@@ -1,64 +1,52 @@
 #include <iostream>
 #include <vector>
+#include <cstdlib>
 using namespace std;
 
-void output(const unsigned nbits, unsigned bitpat)
+int main(int argc, char** argv)
 {
-	for(unsigned k = 0; k < nbits; ++k)
-	{
-		cout<< (bitpat%2?'1':'0');
-		bitpat /= 2;
-	}
-	cout<<endl;
-}
-
-unsigned rot(const unsigned nbits, unsigned bitpat, unsigned shift)
-{
-    return (bitpat << shift) | (bitpat >> (sizeof(bitpat) * nbits - shift));
-}
-
-unsigned rev(const unsigned nbits, unsigned bitpat)
-{
-	unsigned r = 0;
-	for(unsigned k = 0; k < nbits; ++k)
-	{
-		r |= (bitpat%2) << (nbits-1-k);
-		bitpat /= 2;
-	}
-	
-	return r;
-}
-
-int main()
-{
-	const unsigned nbits = 3;
-	unsigned len = 1;
-	for(unsigned k = 0; k < nbits; ++k) len *= 2;
-	vector<bool> ok(len);
-	for(unsigned i = 0; i < len; ++i)
-		ok[i] = true;
+	unsigned nbits = argc>1?atoi(argv[1]):3;
+	unsigned len = 1<<nbits;
+	unsigned cut = ((unsigned)(-1)) >> (8*sizeof(unsigned)-nbits);
+	vector<bool> ok(len, true);
 	
 	for(unsigned i = 0; i < len; ++i)
 	{
 		if(ok[i])
 		{
-			cout<<"# "; output(nbits, i);
-			
-			unsigned r = rev(nbits, i);
-			cout<<"R "; output(nbits, r);
+			unsigned ii = i;
+			unsigned r = 0;
+			for(unsigned k = 0; k < nbits; ++k)
+			{
+				r |= (ii%2) << (nbits-1-k);
+				ii /= 2;
+			}
 			if(r > i) ok[r] = false;
 			
 			for(unsigned s = 1; s < nbits; ++s)
 			{
-				unsigned j = rot(nbits, i, s);
-				cout<<"S "; output(nbits, j);
+				unsigned j = ( (i<<s) | (i>>(nbits-s)) ) & cut;
 				if(j > i) ok[j] = false;
+				
+				unsigned k = ( (r<<s) | (r>>(nbits-s)) ) & cut;
+				if(k > i) ok[k] = false;
 			}
 		}
 	}
 	
 	for(unsigned i = 0; i < len; ++i)
-		if(ok[i]) output(nbits, i);
-	
+	{
+		if(ok[i])
+		{
+			unsigned ii = i;
+			for(unsigned k = 0; k < nbits; ++k)
+			{
+				cout<< (ii%2?'1':'0');
+				ii /= 2;
+			}
+			cout<<'\n';
+		}
+	}
+	cout<<flush;
 	return 0;
 }
