@@ -1,4 +1,6 @@
 #include <map>
+#include <string>
+#include <fstream>
 namespace LW {
 
 enum interpol_method {closest, linear, quadratic};
@@ -42,6 +44,37 @@ class FunInterpolTable
 			//yperc = 0;
 			call_count = 0;
 			eval_count = 0;
+		}
+		
+		void save(const std::string& filename)
+		{
+			std::ofstream f(filename.c_str());
+			if(! f)
+				throw "ERROR: Could not open file \""+filename+"\" for writing.";
+			
+			for(point_iter p = points.begin(); p != points.end(); ++p)
+			{
+				f<< p->first <<" "<< p-> second <<"\n";
+			}
+		}
+		
+		void load(const std::string& filename, bool clear=false) // clear=true means delete existing data
+		{
+			std::ifstream f(filename.c_str());
+			if(! f)
+				throw "ERROR: Could not open file \""+filename+"\" for reading.";
+			
+			if(clear)
+				points.clear();
+			
+			xtype x; ytype y;
+			while(f.good())
+			{
+				f >> x;
+				if(! f.good()) break;
+				f >> y;
+				points.insert( std::pair<xtype,ytype>(x, y) );
+			}
 		}
 		
 		ytype eval(const xtype& x)

@@ -88,6 +88,10 @@ int main()
 	}
 	cout<<"f3, random, quadratic, precomputes: "<< f6.getCallCount() <<" calls, "<< f6.getEvalCount() <<" evals"<<endl;
 	
+	f6.save("function_interpolation_table_f6.saved.dat");
+	f5.load("function_interpolation_table_f6.saved.dat", true);
+	f5.save("function_interpolation_table_f5.saved.dat");
+	
 	// gnuplot: plot "function_interpolation_table_f0.dat" w p title "random, closest", "function_interpolation_table_f1.dat" w p title "random, linear", "function_interpolation_table_f2.dat" w p title "random, closest, precomputes", "function_interpolation_table_f3.dat" w p title "random, linear, precomputes", "function_interpolation_table_f5.dat" w p title "random, quadratic", "function_interpolation_table_f6.dat" w p title "random, quadratic, precomputes", sin(x)
 	
 	return 0;
