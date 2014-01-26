@@ -1,0 +1,44 @@
+#!/bin/bash
+device="$1"
+
+declare -A cdisks
+#cdisks[1d1a71bc-8186-47ba-a103-701e74cc1529]=morpheus
+#cdisks[1b36503f-b1b7-4f37-8ab5-fad475081671]=neo
+#cdisks[04bb7268-c410-4387-8db6-7ae488f9944a]=alphabase
+#cdisks[68c3f8ec-d423-4d44-8172-255d9b55d0e7]=trinity
+cdisks[515d49be-7b40-4a33-9b3e-44b3dc003f62]=niobe
+cdisks[c7679d27-b5e0-47f9-b128-cf4e01f6ce20]=ghost
+cdisks[9c022a28-d434-41ae-bb0b-5f76160648ab]=merovingian
+cdisks[3ac2617a-3dc2-42ff-aca0-5499e2b4bf96]=persephone
+
+keydisk="/mnt/keymaker"
+ramdisk="/mnt/oracle"
+
+mount | grep "$keydisk" &> /dev/null || exit
+
+if cryptsetup isLuks $device
+then
+	uuid=`cryptsetup luksDump $device | grep UUID | awk '{print $2}'`
+	disk=${cdisks[$uuid]}
+	if [ -n "$disk" ]
+	then
+		echo "`date` - luks device $device has uuid $uuid and is $disk"
+
+		# close stale mounts
+		mount | grep "/mnt/$disk" &> /dev/null && umount /mnt/$disk
+		test -e /dev/mapper/$disk && cryptsetup luksClose $disk
+
+		# decrypt with keyfile and mount
+		cryptsetup -d ${keydisk}/${disk}.key luksOpen $device $disk
+		mkdir -p /mnt/$disk
+		mount /dev/mapper/$disk /mnt/$disk
+
+		# ubuntu may mount dev mappers automatically, let's undo that, and keep our mount-point only
+		#sleep 3
+		#mount | grep "/dev/mapper/$disk" | grep -v "/mnt/$disk " | while read dv on mp r; do umount "$mp"; rmdir "$mp"; done
+
+		#mkdir -p ${ramdisk}/.drives/$disk
+		#mount --bind /mnt/$disk ${ramdisk}/.drives/$disk
+		#cp -rs ${ramdisk}/.drives/${disk}/* ${ramdisk}/
+	fi
+fi
