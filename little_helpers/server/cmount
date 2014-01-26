@@ -2,17 +2,18 @@
 device="$1"
 
 declare -A cdisks
-#cdisks[1d1a71bc-8186-47ba-a103-701e74cc1529]=morpheus
-#cdisks[1b36503f-b1b7-4f37-8ab5-fad475081671]=neo
-#cdisks[04bb7268-c410-4387-8db6-7ae488f9944a]=alphabase
-#cdisks[68c3f8ec-d423-4d44-8172-255d9b55d0e7]=trinity
+cdisks[04bb7268-c410-4387-8db6-7ae488f9944a]=alphabase
+cdisks[68c3f8ec-d423-4d44-8172-255d9b55d0e7]=trinity
 cdisks[515d49be-7b40-4a33-9b3e-44b3dc003f62]=niobe
 cdisks[c7679d27-b5e0-47f9-b128-cf4e01f6ce20]=ghost
 cdisks[9c022a28-d434-41ae-bb0b-5f76160648ab]=merovingian
 cdisks[3ac2617a-3dc2-42ff-aca0-5499e2b4bf96]=persephone
+cdisks[cd14195a-955e-4204-91db-0cc9be7703df]=morpheus
+cdisks[caa3dc85-682e-4609-97a2-7b033738341a]=neo
+cdisks[71474f4a-658e-4c2a-a450-4088284c4098]=seraph
 
 keydisk="/mnt/keymaker"
-ramdisk="/mnt/oracle"
+# ramdisk="/mnt/oracle"
 
 mount | grep "$keydisk" &> /dev/null || exit
 
@@ -36,9 +37,5 @@ then
 		# ubuntu may mount dev mappers automatically, let's undo that, and keep our mount-point only
 		#sleep 3
 		#mount | grep "/dev/mapper/$disk" | grep -v "/mnt/$disk " | while read dv on mp r; do umount "$mp"; rmdir "$mp"; done
-
-		#mkdir -p ${ramdisk}/.drives/$disk
-		#mount --bind /mnt/$disk ${ramdisk}/.drives/$disk
-		#cp -rs ${ramdisk}/.drives/${disk}/* ${ramdisk}/
 	fi
 fi
