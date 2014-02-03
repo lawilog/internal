@@ -9,9 +9,14 @@ deskDim=$( wmctrl -d | grep '*' | awk '{print $9}' )
 case $deskDim in
 	2880x995)
 		deskW=(1280 1600)
-		deskH=( 995  900)	
+		deskH=( 995  900)
 	;;
-	
+
+	3520x1051)
+		deskW=(1920 1600)
+		deskH=(1051  900)
+		;;
+
 	*)
 		deskW=$( echo $deskDim | sed 's/x/ /' | awk '{print $1}' )
 		deskH=$( echo $deskDim | sed 's/x/ /' | awk '{print $2}' )

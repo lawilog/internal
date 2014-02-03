@@ -1,0 +1,24 @@
+# /etc/fstab: static file system information.
+#
+# Use 'blkid' to print the universally unique identifier for a
+# device; this may be used with UUID= as a more robust way to name devices
+# that works even if disks are added and removed. See fstab(5).
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+# / was on /dev/sda1 during installation
+UUID=52ba3967-a604-4e61-b018-95a563cc99d4 /               ext4    errors=remount-ro 0       1
+# swap was on /dev/sda2 during installation
+# LW, do not swap:
+#UUID=b4263cbf-4356-40c5-a084-9bb10cc0293c none            swap    sw              0       0
+
+none /mnt/oracle tmpfs defaults,size=1G 0 0
+none /tmp tmpfs defaults,size=2G 0 0
+
+/dev/mapper/ghost /mnt/ghost ext4 defaults,noauto 0 0
+/dev/mapper/merovingian /mnt/merovingian ext4 defaults,noauto 0 0
+/dev/mapper/morpheus /mnt/morpheus ext4 defaults,noauto 0 0
+/dev/mapper/neo /mnt/neo ext4 defaults,noauto 0 0
+/dev/mapper/niobe /mnt/niobe ext4 defaults,noauto 0 0
+/dev/mapper/persephone /mnt/persephone ext4 defaults,noauto 0 0
+/dev/mapper/trinity /mnt/trinity ext4 defaults,noauto 0 0
+/dev/mapper/seraph /mnt/seraph ext4 defaults,noauto 0 0
