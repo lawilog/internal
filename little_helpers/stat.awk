@@ -19,9 +19,9 @@
 	}
 }
 END {
-	for(i=1; i<=NFmax; ++i) printf("%g ", min[i]); print(" min");
-	for(i=1; i<=NFmax; ++i) printf("%g ", max[i]); print(" max");
-	for(i=1; i<=NFmax; ++i) printf("%g ", s[i]); print(" sum");
-	for(i=1; i<=NFmax; ++i) printf("%g ", s[i]/c[i]); print(" avg");
-	for(i=1; i<=NFmax; ++i) printf("%g ", sqrt( (q[i]-s[i]*s[i]/c[i]) / (c[i]-1) )); print(" stddev");
+	for(i=1; i<=NFmax; ++i) printf("%g\t", min[i]); print("\tmin");
+	for(i=1; i<=NFmax; ++i) printf("%g\t", max[i]); print("\tmax");
+	for(i=1; i<=NFmax; ++i) printf("%g\t", s[i]); print("\tsum");
+	for(i=1; i<=NFmax; ++i) printf("%g\t", s[i]/c[i]); print("\tavg");
+	for(i=1; i<=NFmax; ++i) printf("%g\t", sqrt( (q[i]-s[i]*s[i]/c[i]) / (c[i]-1) )); print("\tstddev");
 }
