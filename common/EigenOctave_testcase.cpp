@@ -28,5 +28,43 @@ int main()
 	
 	cout<<"a(ind) = []; a = ["<< remove(a, ind).transpose() <<"]\n"<<endl;
 	
+	MatrixXd M(3, 3);
+	M <<
+		11, 12, 13,
+		21, 22, 23,
+		31, 32, 33;
+	
+	cout<<"M = \n"<< M <<endl;
+	
+	VectorXi c(2); c<< 0, 2;
+	cout<<"M(:, [1, 3]) = \n"<< pick_col(M, c) <<endl;
+	cout<<"M([1, 3], :) = \n"<< pick_row(M, c) <<endl;
+	
+	cout<<"a = ["<< a.transpose() <<"]\n"<<endl;
+	cout<<"Crash test:"<<endl;
+	try
+	{
+		ind(0) = -1;
+		ind(1) = 0;
+		ind(2) = 3;
+		VectorXd b = remove(a, ind);
+	}
+	catch (const std::exception& e)
+	{
+		cout<<"Caught expection: \""<< e.what() <<"\"."<<endl;
+    }
+	
+	try
+	{
+		ind(0) = 3;
+		ind(1) = 2;
+		ind(2) = 1;
+		VectorXd b = remove(a, ind);
+	}
+	catch (const std::exception& e)
+	{
+		cout<<"Caught expection: \""<< e.what() <<"\"."<<endl;
+    }
+	
 	return 0;
 }
