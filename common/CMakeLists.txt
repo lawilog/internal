@@ -3,6 +3,8 @@ project(common)
 
 add_definitions(-Wall -std=c++0x -O2)
 
+include_directories("/usr/include/eigen3")
+
 add_executable(extract_block
 	extract_block.cpp
 	TableFile.cpp
@@ -54,3 +56,4 @@ add_executable(RandDistrib_testcase RandDistrib_testcase.cpp)
 add_executable(stringprintf stringprintf.cpp)
 add_executable(FunInterpolTable_testcase FunInterpolTable_testcase.cpp)
 add_executable(bytes2str_testcase bytes2str_testcase.cpp)
+add_executable(EigenOctave_testcase EigenOctave_testcase.cpp)
