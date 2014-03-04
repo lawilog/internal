@@ -34,37 +34,45 @@ int main()
 		21, 22, 23,
 		31, 32, 33;
 	
-	cout<<"M = \n"<< M <<endl;
+	cout<<"\n M = \n"<< M <<endl;
 	
 	VectorXi c(2); c<< 0, 2;
 	cout<<"M(:, [1, 3]) = \n"<< pick_col(M, c) <<endl;
 	cout<<"M([1, 3], :) = \n"<< pick_row(M, c) <<endl;
 	
-	cout<<"a = ["<< a.transpose() <<"]\n"<<endl;
+	cout<<"\n a = ["<< a.transpose() <<"]\n"<<endl;
 	cout<<"Crash test:"<<endl;
 	try
 	{
 		ind(0) = -1;
 		ind(1) = 0;
 		ind(2) = 3;
+		cout<<"\n ind = ["<< ind.transpose() <<"]"<<endl;
+		cout<<"a(ind) = [];"<<endl;
 		VectorXd b = remove(a, ind);
 	}
 	catch (const std::exception& e)
 	{
 		cout<<"Caught expection: \""<< e.what() <<"\"."<<endl;
-    }
+	}
 	
 	try
 	{
 		ind(0) = 3;
 		ind(1) = 2;
 		ind(2) = 1;
+		cout<<"\n ind = ["<< ind.transpose() <<"]"<<endl;
+		cout<<"a(ind) = [];"<<endl;
 		VectorXd b = remove(a, ind);
 	}
 	catch (const std::exception& e)
 	{
 		cout<<"Caught expection: \""<< e.what() <<"\"."<<endl;
-    }
+	}
+	
+	set_ind(a, ind, static_cast<VectorXd>(M.row(0)));
+	cout<<"\nind = ["<< ind.transpose() <<"]"<<endl;
+	cout<<"a(ind) = M(1,:); a = ["<< a.transpose() <<"]\n"<<endl;
 	
 	return 0;
 }

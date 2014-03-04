@@ -9,7 +9,7 @@ namespace Eigen {
 
 // Matlab:  ind = find(x > 0)
 // C++:     VectorXi ind = find(x.array() > 0);
-VectorXi find(const Matrix<bool, Dynamic, 1>& b)
+inline VectorXi find(const Matrix<bool, Dynamic, 1>& b)
 {
 	unsigned n = 0;
 	for(unsigned i = 0; i < b.size(); ++i)
@@ -29,7 +29,7 @@ VectorXi find(const Matrix<bool, Dynamic, 1>& b)
 // Matlab:  y = x(ind);
 // C++:     VectorXd y = pick(x, ind);
 template <typename T>
-Matrix<T, Dynamic, 1> pick(const Matrix<T, Dynamic, 1>& x, const VectorXi& ind)
+inline Matrix<T, Dynamic, 1> pick(const Matrix<T, Dynamic, 1>& x, const VectorXi& ind)
 {
 	Matrix<T, Dynamic, 1> y(ind.size());
 	for(unsigned i = 0; i < ind.size(); ++i)
@@ -39,10 +39,20 @@ Matrix<T, Dynamic, 1> pick(const Matrix<T, Dynamic, 1>& x, const VectorXi& ind)
 }
 
 
+// Matlab:  y(ind) = x;
+// C++:     set_ind(y, ind, x);
+template <typename T>
+inline void set_ind(Matrix<T, Dynamic, 1>& y, const VectorXi& ind, const Matrix<T, Dynamic, 1>& x)
+{
+	for(unsigned i = 0; i < ind.size(); ++i)
+		y(ind(i)) = x(i);
+}
+
+
 // Matlab:  N = M(:, ind);
 // C++:     MatrixXd y = pick_col(M, ind);
 template <typename T>
-Matrix<T, Dynamic, Dynamic> pick_col(const Matrix<T, Dynamic, Dynamic>& M, const VectorXi& ind)
+inline Matrix<T, Dynamic, Dynamic> pick_col(const Matrix<T, Dynamic, Dynamic>& M, const VectorXi& ind)
 {
 	Matrix<T, Dynamic, Dynamic> N(M.rows(), ind.size());
 	for(unsigned i = 0; i < ind.size(); ++i)
@@ -55,7 +65,7 @@ Matrix<T, Dynamic, Dynamic> pick_col(const Matrix<T, Dynamic, Dynamic>& M, const
 // Matlab:  N = M(ind, :);
 // C++:     MatrixXd y = pick_row(M, ind);
 template <typename T>
-Matrix<T, Dynamic, Dynamic> pick_row(const Matrix<T, Dynamic, Dynamic>& M, const VectorXi& ind)
+inline Matrix<T, Dynamic, Dynamic> pick_row(const Matrix<T, Dynamic, Dynamic>& M, const VectorXi& ind)
 {
 	Matrix<T, Dynamic, Dynamic> N(ind.size(), M.cols());
 	for(unsigned i = 0; i < ind.size(); ++i)
@@ -69,7 +79,7 @@ Matrix<T, Dynamic, Dynamic> pick_row(const Matrix<T, Dynamic, Dynamic>& M, const
 // C++:     VectorXd y = remove(x, ind);
 // ind must be sorted and unique - an expection is thrown otherwise
 template <typename T>
-Matrix<T, Dynamic, 1> remove(const Matrix<T, Dynamic, 1>& x, const VectorXi& ind)
+inline Matrix<T, Dynamic, 1> remove(const Matrix<T, Dynamic, 1>& x, const VectorXi& ind)
 {
 	if(ind.size() == 0)
 		return x;
