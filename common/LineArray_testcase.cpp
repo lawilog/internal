@@ -1,12 +1,13 @@
 #include <iostream>
 #include <string>
+#include <sstream>
 #include "LineArray.h"
 using namespace std;
 using namespace LW;
 
 int main()
 {
-	LineArray la("zero one two three four five sex seven");
+	LineArray la("zero one two three four five six seven");
 	for(int i = -9; i < 9; ++i)
 		cout<<"la["<<i<<"] = \""<< la[i] <<"\""<<endl;
 	
@@ -41,12 +42,22 @@ int main()
 		cout<<i<<" \""<<getColumnFromLine(" ", i)<<"\""<<endl;
 	
 	
-	LineArray la5("  1  2.3   foo bar	4.567  8e-1");
+	const char la5s[] = "  1  2.3   foo bar	4.567  8e-1";
+	cout<< la5s <<endl;
+	
+	LineArray la5(la5s);
 	for(int i = 0; i < 7; ++i)
 		cout<<"string(la5["<<i<<"]) = \""<< la5.col<string>(i) <<"\""<<endl;
 	
 	for(int i = 0; i < 7; ++i)
 		cout<<"double(la5["<<i<<"]) = "<< la5.col<double>(i) <<endl;
+	
+	cout<< la5 <<endl;
+	
+	stringstream ss;
+	ss << la5;
+	string s = ss.str();
+	cout<< s <<endl;
 	
 	return 0;
 }
