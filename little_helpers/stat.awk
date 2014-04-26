@@ -24,4 +24,5 @@ END {
 	for(i=1; i<=NFmax; ++i) printf("%g\t", s[i]); print("\tsum");
 	for(i=1; i<=NFmax; ++i) printf("%g\t", s[i]/c[i]); print("\tavg");
 	for(i=1; i<=NFmax; ++i) printf("%g\t", sqrt( (q[i]-s[i]*s[i]/c[i]) / (c[i]-1) )); print("\tstddev");
+	for(i=1; i<=NFmax; ++i) printf("%g\t", 100*sqrt( (q[i]-s[i]*s[i]/c[i]) / (c[i]-1) ) / (s[i]/c[i]<0? -s[i]/c[i] : s[i]/c[i])); print("\tStddevProcent");
 }

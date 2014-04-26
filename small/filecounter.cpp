@@ -65,6 +65,7 @@ void LW_dirstat::outmorethan(const string& basepath, const unsigned long& min_co
 	if(nfiles_sum >= min_count)
 	{
 		string path = (dirname=="" ? basepath : basepath+"/"+dirname);
+		cout.width(8);
 		cout<< nfiles_sum <<"\t"<< path <<endl;
 		for(auto subdir: subdirs) subdir.outmorethan(path, min_count);
 	}
