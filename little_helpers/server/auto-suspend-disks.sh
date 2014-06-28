@@ -5,6 +5,7 @@
 CHECK_INTERVAL=600
 COUNT=6
 
+sleep $CHECK_INTERVAL # this is only useful on boot - wait for disks to show up in /dev/
 declare -A counts
 iostat -d $CHECK_INTERVAL $(ls /dev/sd?) | while read dev tps R
 do
