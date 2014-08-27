@@ -1,9 +1,10 @@
 #include <map>
 #include <string>
 #include <fstream>
+#include <cmath>
 namespace LW {
 
-enum interpol_method {closest, linear, quadratic};
+enum interpol_method {closest, linear, quadratic, log_linear, log_quadratic};
 
 // xtype and ytype could be double or float
 template<interpol_method method, typename xtype=double, typename ytype=double>
@@ -19,28 +20,37 @@ class FunInterpolTable
 		unsigned call_count;
 		unsigned eval_count;
 		
-		double dist(const xtype& x0, const xtype& x1) const
+		static inline xtype xabs(const xtype& x)
 		{
-			double d = x1 - x0;
-			return (d<0?-d:d);
+			return (x<0?-x:x);
 		}
 		
-		ytype interpol_linear(const xtype& x0, const ytype& y0, const xtype& x1, const ytype& y1, const xtype& xi) const
+		static inline ytype yabs(const ytype& y)
+		{
+			return (y<0?-y:y);
+		}
+		
+		static inline xtype dist(const xtype& x0, const xtype& x1)
+		{
+			return xabs(x1 - x0);
+		}
+		
+		static inline ytype interpol_linear(const xtype& x0, const ytype& y0, const xtype& x1, const ytype& y1, const xtype& xi)
 		{
 			return y1 + (xi - x1) * (y1 - y0) / (x1 - x0);
 		}
 		
-		ytype interpol_quadratic(const xtype& x0, const ytype& y0, const xtype& x1, const ytype& y1, const xtype& x2, const ytype& y2, const xtype& xi) const
+		static inline ytype interpol_quadratic(const xtype& x0, const ytype& y0, const xtype& x1, const ytype& y1, const xtype& x2, const ytype& y2, const xtype& xi)
 		{
 			// Lagrange interpolation
 			return y0 * (xi-x1)*(xi-x2)/( (x0-x1)*(x0-x2) )  +  y1 * (xi-x0)*(xi-x2)/( (x1-x0)*(x1-x2) )  +  y2 * (xi-x0)*(xi-x1)/( (x2-x0)*(x2-x1) );
 		}
 		
 	public:
-		FunInterpolTable( ytype(*_fun)(xtype))
+		FunInterpolTable( ytype(*_fun)(xtype), xtype _xperc)
 		{
 			fun = _fun;
-			xperc = 1e-1;
+			xperc = _xperc;
 			//yperc = 0;
 			call_count = 0;
 			eval_count = 0;
@@ -116,8 +126,10 @@ class FunInterpolTable
 				case closest: points_needed = 1; break;
 				case linear:  points_needed = 2; break;
 				case quadratic: points_needed = 3; break;
+				case log_linear: points_needed = 2; break;
+				case log_quadratic: points_needed = 3; break;
 			}
-			static_assert(method==closest || method==linear || method==quadratic, "Interpolation method not yet implemented.");
+			static_assert(method==closest || method==linear || method==quadratic || method==log_linear || method==log_quadratic, "Interpolation method not yet implemented.");
 			
 			// search points for the first position which is equal or greater than x
 			point_iter geq = points.lower_bound(x);
@@ -160,6 +172,7 @@ class FunInterpolTable
 				}
 				
 				case linear:
+				case log_linear:
 				{
 					point_iter p0, p1;
 					if(geq == points.end()) // x is greater than all previously calculated positions
@@ -181,11 +194,26 @@ class FunInterpolTable
 						||
 						(dist(x, p0->first) <= xperc && dist(x, p1->first) <= xperc) // both closest points are close enough
 					)
-						return interpol_linear(p0->first, p0->second, p1->first, p1->second, x);
+					{
+						if(method==linear)
+							return interpol_linear(p0->first, p0->second, p1->first, p1->second, x);
+						else
+						{
+							int sign_y0 = (p0->second > 0 ? 1:-1);
+							int sign_y1 = (p1->second > 0 ? 1:-1);
+							if(sign_y0 != sign_y1)
+								return interpol_linear(p0->first, p0->second, p1->first, p1->second, x);
+							else
+								return sign_y0 * exp( interpol_linear(
+									p0->first, log(sign_y0 * p0->second),
+									p1->first, log(sign_y1 * p1->second), x) );
+						}
+					}
 					break;
 				}
 				
 				case quadratic:
+				case log_quadratic:
 				{
 					point_iter p0, p1, p2;
 					if(geq == points.end()) // x is greater than all previously calculated positions
@@ -223,7 +251,29 @@ class FunInterpolTable
 						||
 						(dist(x, p0->first) <= xperc && dist(x, p1->first) <= xperc && dist(x, p2->first) <= xperc) // all three closest points are close enough
 					)
-						return interpol_quadratic(p0->first, p0->second, p1->first, p1->second, p2->first, p2->second, x);
+					{
+						if(method==quadratic)
+							return interpol_quadratic(
+								p0->first, p0->second,
+								p1->first, p1->second,
+								p2->first, p2->second, x);
+						else
+						{
+							int sign_y0 = (p0->second > 0 ? 1:-1);
+							int sign_y1 = (p1->second > 0 ? 1:-1);
+							int sign_y2 = (p2->second > 0 ? 1:-1);
+							if(sign_y0 != sign_y1 || sign_y0 != sign_y2)
+								return interpol_quadratic(
+									p0->first, p0->second,
+									p1->first, p1->second,
+									p2->first, p2->second, x);
+							else
+								return sign_y0 * exp( interpol_quadratic(
+									p0->first, log(sign_y0 * p0->second),
+									p1->first, log(sign_y1 * p1->second),
+									p2->first, log(sign_y2 * p2->second), x) );
+						}
+					}
 					break;
 				}
 				
