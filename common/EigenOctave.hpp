@@ -1,3 +1,6 @@
+#ifndef _LW_EIGENOCTAVE_
+#define _LW_EIGENOCTAVE_
+
 #include <Eigen/Dense>
 #include <Eigen/QR>
 #include <stdexcept>
@@ -107,3 +110,5 @@ inline Matrix<T, Dynamic, 1> remove(const Matrix<T, Dynamic, 1>& x, const Vector
 }
 
 }
+
+#endif // _LW_EIGENOCTAVE_

@@ -1,3 +1,6 @@
+#ifndef _LW_LSQNONNEG_
+#define _LW_LSQNONNEG_
+
 #include <iostream>
 #include <Eigen/Dense>
 #include <Eigen/QR>
@@ -199,3 +202,5 @@ VectorXd lsqnonneg(const MatrixXd& C, const VectorXd& d)
 }
 
 }
+
+#endif // _LW_LSQNONNEG_

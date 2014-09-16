@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 2.6)
 project(common)
 
-add_definitions(-Wall -std=c++0x -O2)
+add_definitions(-Wall -Wno-unused-local-typedefs -std=c++0x -O2)
 
 include_directories("/usr/include/eigen3")
+include_directories("$ENV{HOME}/proggen/common")
 
 add_executable(extract_block
 	extract_block.cpp
@@ -58,3 +59,4 @@ add_executable(FunInterpolTable_testcase FunInterpolTable_testcase.cpp)
 add_executable(bytes2str_testcase bytes2str_testcase.cpp)
 add_executable(EigenOctave_testcase EigenOctave_testcase.cpp)
 add_executable(lsqnonneg_test lsqnonneg_test.cpp)
+add_executable(lscov_testcase lscov_testcase.cpp)
