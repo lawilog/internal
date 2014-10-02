@@ -9,9 +9,9 @@ fi
 if [ "${relurl:0:1}" == "/" ]
 then
 	x="${baseurl#*.*/}"
-	echo "x = $x"
+	# echo "x = $x"
 	echo "${baseurl:0:$((${#baseurl} - ${#x}))}${relurl:1}"
-elif [ "${relurl:0:4}" == "http" ]
+elif (echo "$relurl" | egrep -q '^[A-Za-z0-9]*://') # [ "${relurl:0:4}" == "http" ]
 then
 	echo "${relurl}"
 elif [ ! -z "${relurl}" ]
