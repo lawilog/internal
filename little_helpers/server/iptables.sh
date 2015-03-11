@@ -14,11 +14,22 @@ iptables -A OUTPUT -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT
 # accept ssh from everywhere
 iptables -A INPUT -p tcp --dport ssh -j ACCEPT
 
-# accept incoming OpenVPN from everywhere
-iptables -A INPUT -p udp --dport 1194 -j ACCEPT
+# accept http and https from everywhere
+iptables -A INPUT -p tcp --dport http -j ACCEPT
+iptables -A INPUT -p tcp --dport https -j ACCEPT
 
-# allow 192.168.*.* to access all services
+# accept incoming OpenVPN from everywhere
+iptables -A INPUT -p udp --dport openvpn -j ACCEPT
+
+# accept jabber from everywhere
+iptables -A INPUT -p tcp --dport xmpp-client -j ACCEPT
+iptables -A INPUT -p tcp --dport xmpp-server -j ACCEPT
+# iptables -A INPUT -p tcp --dport 5298 -j ACCEPT
+
+# allow 192.168.*.* and 10.6.*.* to access all services
 iptables -A INPUT -s 192.168.0.0/16 -j ACCEPT
+#iptables -A INPUT -s 192.168.66.0/29 -j ACCEPT
+iptables -A INPUT -s 10.6.0.0/16 -j ACCEPT
 
 # accept TCP rpcbind, nfs, vnc, X11 from 192.168.*.*
 #for port in 111 2049 5901:5904 6001:6004
@@ -33,6 +44,7 @@ iptables -A INPUT -s 192.168.0.0/16 -j ACCEPT
 # dont log:
 iptables -A INPUT -p tcp --dport 135:139 -j DROP
 iptables -A INPUT -p tcp --dport 445 -j DROP
+iptables -A INPUT -p tcp --dport 67 -j DROP
 #multicast:
 iptables -A INPUT -d 224.0.0.0/4 -j DROP
 # send other stuff to syslog
