@@ -2,7 +2,7 @@
 s="$1"
 shift
 msg="${@}"
-test -z "$1" && read s msg
+test -z "$s" && read s msg
 printf "%9i = " "$s"
 test $s -lt 60 && echo -e "${s}s $msg\t${msg}" && exit
 min=$(( $s / 60 ))
