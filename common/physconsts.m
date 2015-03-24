@@ -1,3 +1,5 @@
+% http://physics.nist.gov/cuu/Constants/Table/allascii.txt
+
 installed_packages = pkg('list');
 b=0; for p=installed_packages; if strcmp(p{1,1}.name, 'miscellaneous'); b=1; end; end
 if b
@@ -24,6 +26,9 @@ if b
 	sigma = physical_constant('Stefan-Boltzmann constant')
 	eV = physical_constant('electron volt')
 	Ha = physical_constant('Hartree energy')
+	eps0 = physical_constant('electric constant')
+	mu0 = physical_constant('mag. constant')
+	Ry = physical_constant('Rydberg constant times hc in J')
 else
 	c = 299792458
 	h = 6.62606957e-34
@@ -46,5 +51,8 @@ else
 	sigma = 5.670373e-08
 	eV = 1.602176565e-19
 	Ha = 4.35974434e-18
+	eps0 = 8.85418781762e-12
+	mu0 = 4*pi*1e-7
+	Ry = 2.179872171e-18
 end
 
