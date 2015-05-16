@@ -12,6 +12,7 @@ cdisks[cd14195a-955e-4204-91db-0cc9be7703df]=morpheus
 cdisks[caa3dc85-682e-4609-97a2-7b033738341a]=neo
 cdisks[71474f4a-658e-4c2a-a450-4088284c4098]=seraph
 cdisks[a6f95ec6-a925-467f-ade3-ef34b14df19e]=trainman
+cdisks[b898c90d-f41c-49b3-b805-832b0e01b7f1]=smith
 
 keydisk="/mnt/keymaker"
 # ramdisk="/mnt/oracle"
