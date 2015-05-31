@@ -29,6 +29,7 @@ create)
 	echo "Creating links for $disk"
 	if not_mounted "$bindpath"
 	then
+		test -e "${ramdisk}/${dir}" || (mkdir -p "${ramdisk}/${dir}" && chown root:users "${ramdisk}/${dir}")
 		mkdir -p "$bindpath"
 		mount --bind /mnt/$disk "$bindpath"
 	fi
@@ -37,7 +38,7 @@ create)
 
 recreate)
 	$0 remove
-	for disk in ghost merovingian morpheus niobe persephone trinity seraph # neo
+	for disk in ghost merovingian morpheus niobe persephone trinity seraph smith # neo
 	do
 		$0 create $disk
 	done
