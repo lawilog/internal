@@ -1,2 +1,2 @@
 #!/bin/bash
-/root/bin/hddstatus.sh | mailx -s "HDD Status" architect
+(echo "I am $(whoami). PATH=$PATH"; /root/bin/hddstatus.sh 2>&1) | mailx -s "HDD Status" architect
