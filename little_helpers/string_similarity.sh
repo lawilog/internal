@@ -80,6 +80,6 @@ else
 	echo "$2" | sed 's/\(.\)/\1\n/g' > "$fb"
 	outp=$(diff -di "$fa" "$fb" | egrep '^<|^>')
 	test $verbose -eq 1 && echo "$outp"
-	echo $(echo "$outp" | egrep '^<' | wc -l) $(echo "$outp" | egrep '^>' | wc -l) $(cat "$fa" | wc -l) $(cat "$fb" | wc -l) | awk "{a=100*(1-\$1/\$3); b=100*(1-\$2/\$4); printf(\"%i\\n\", $printmode)}"
+	echo $(echo "$outp" | egrep '^<' | wc -l) $(echo "$outp" | egrep '^>' | wc -l) $(cat "$fa" | wc -l) $(cat "$fb" | wc -l) | awk "{a=\$3==1?0:100*(1-\$1/(\$3-1)); b=\$4==1?0:100*(1-\$2/(\$4-1)); printf(\"%i\\n\", $printmode)}"
 fi
 rm "$fa" "$fb"
