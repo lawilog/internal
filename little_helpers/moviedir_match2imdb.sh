@@ -1,6 +1,4 @@
 #!/bin/bash
-if [ $# -eq 0 ]; then while read dir; do $0 "$dir"; done; exit $?; fi
-
 for dir # in "$@"
 do
 	if [ ! -d "$dir" ]
@@ -83,7 +81,7 @@ do
 	awk '(NF>0) {print "[" ++n "]\t" $0}' "$imdbCandidatesFile" | tac
 	echo "$dir"
 	case "$N" in
-		0) echo "No idea. Press  s to skip  or  a string containg tt for an imdb id." ;;
+		0) echo "No idea. Enter  s to skip  or  a string containg tt for an imdb id." ;;
 		1) echo "Enter 1 to accept candidate or  s to skip  or  a string containg tt for own imdb id." ;;
 		*) echo "$N candidates. Enter any of the above numbers or  s to skip  or  a string containg tt for own imdb id." ;;
 	esac
