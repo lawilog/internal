@@ -12,3 +12,6 @@ cat /mnt/drop/movielist_20150606_commarec.txt | while read dir; do echo "$dir"; 
 
 # stats
 awk -F'\t' '{if($2==100) ++p; if($2>0 && $2<100) ++l; if($2<=0) ++n} END{print p,l,n, "\n", p/NR, l/NR, n/NR}' /mnt/drop/movielist_20150606_match2.dat
+
+# match
+cat /mnt/drop/movielist_20150606_match2.dat | sort -n -k2 -t$'\t' -r | awk -F'\t' '{print $1}' | moviedir_match2imdb.sh

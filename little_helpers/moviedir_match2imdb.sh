@@ -1,4 +1,6 @@
 #!/bin/bash
+if [ $# -eq 0 ]; then while read dir; do $0 "$dir"; done; exit $?; fi
+
 for dir # in "$@"
 do
 	if [ ! -d "$dir" ]
@@ -18,10 +20,9 @@ do
 		if [ -n "$imdbLinks" ]
 		then
 			echo "# Skipping dir \"$dir\", because I found imdb links in movie.nfo: $imdbLinks"
-	
-			echo "# Cleaning dat"
-			rm -vf "$imdbCandidatesFile"
-	
+
+			test -e "$imdbCandidatesFile" && echo "# Cleaning dat" && rm -v "$imdbCandidatesFile"
+
 			continue
 		else
 			imdbID=$(sed -nr 's| *<imdb>(.*)</imdb>|\1|p' "$movienfo" | head -1)
@@ -29,15 +30,14 @@ do
 			then
 				echo "# Rewriting movie.nfo in \"$dir\", because I found <imdb> tag: $imdbID"
 				imdb_query_title_year_by_id.sh "$imdbID" | tr '\t' '\n' > "$movienfo"
-	
-				echo "# Cleaning dat"
-				rm -vf "$imdbCandidatesFile"
-	
+
+				test -e "$imdbCandidatesFile" && echo "# Cleaning dat" && rm -v "$imdbCandidatesFile"
+
 				continue
 			fi
 		fi
 	fi
-	
+
 	# check if candidates are listed in file. if not, create that file
 	if [ ! -e "$imdbCandidatesFile" ]
 	then
@@ -76,17 +76,19 @@ do
 
 		rm "$imdbTempListFile"
 	fi
-	
+
 	N=$(cat "$imdbCandidatesFile" | wc -l)
 	awk '(NF>0) {print "[" ++n "]\t" $0}' "$imdbCandidatesFile" | tac
-	echo "$dir"
+	guessedtitle="$(mediainfo_title.sh "$dir")"
+	echo -e "dir, title: \033[01;36m\"${dir}\"\033[00m, \033[01;32m\"${guessedtitle}\"\033[00m"
 	case "$N" in
 		0) echo "No idea. Enter  s to skip  or  a string containg tt for an imdb id." ;;
 		1) echo "Enter 1 to accept candidate or  s to skip  or  a string containg tt for own imdb id." ;;
 		*) echo "$N candidates. Enter any of the above numbers or  s to skip  or  a string containg tt for own imdb id." ;;
 	esac
-	while read choice
+	while true
 	do
+		read -p "? " choice < /dev/tty
 		if [ "$choice" = "s" -o "$choice" = "S" ]
 		then
 			echo "# Skipped."
@@ -107,4 +109,6 @@ do
 		fi
 		break
 	done
+	# sleep 1
+	echo
 done
