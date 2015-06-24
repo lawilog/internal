@@ -28,11 +28,14 @@ class mystring
 		{
 			if(&w != this) // do not assign object to itself
 			{
-				// delete existing memory
-				delete [] str;
-				
-				len = w.len;
-				str = (len? new char[len] : NULL);
+				if(w.len != len)
+				{
+					// delete existing memory
+					delete [] str;
+					
+					len = w.len;
+					str = (len? new char[len] : NULL);
+				}
 				for(unsigned i = 0; i < len; ++i)
 					str[i] = w.str[i];
 			}
