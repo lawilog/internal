@@ -6,8 +6,10 @@ if [ $# -eq 0 ]; then while read f; do $0 "$f"; done; exit $?; fi
 f=$(find "$@" -exec stat -L --printf="%s " {} \; -print | sort -n -r | head -1 | while read a b; do echo "$b"; done)
 
 title=$(mediainfo_title.sh "$f")
+year=$(mediainfo_year.sh "$f")
 comment=$(mediainfo_format.sh "$f")
-lang=$(mediainfo_langs.sh "$f" | sed 's/ /,/g')
-if [ "$comment" != "" ]; then comment=" -- $comment"; fi
-if [ "$lang" != "" ]; then lang=" ($lang)"; fi
-echo "${title}${comment}${lang}"
+lang=$(mediainfo_audio.sh "$f" | sed 's/ /,/g')
+test "$year" != "" && year=" [$year]"
+test "$comment" != "" && comment=" -- $comment"
+test "$lang" != "" && lang=" ($lang)"
+echo "${title}${year}${comment}${lang}"

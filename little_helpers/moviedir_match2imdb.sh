@@ -51,8 +51,10 @@ do
 		done > "$imdbTempListFile"
 
 		# second, scan existing nfo files for more candidates
-		egrep -o 'www.imdb.com/title/tt[0-9]*' *.nfo 2>/dev/null | while read imdbID
+		(cd "$dir"; egrep -Ho 'www.imdb.com/title/tt[0-9]*' *.nfo 2>/dev/null | sed 's/:/ : /')
+		egrep -ho 'www.imdb.com/title/tt[0-9]*' "$dir"/*.nfo 2>/dev/null | while read imdbUrl
 		do
+			imdbID=$(echo "$imdbUrl" | egrep -o 'tt[0-9]+')
 			imdb_query_title_year_by_id.sh "$imdbID"
 		done >> "$imdbTempListFile"
 
