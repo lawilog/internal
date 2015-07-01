@@ -94,13 +94,13 @@ do
 		if [ "$choice" = "s" -o "$choice" = "S" ]
 		then
 			echo "# Skipped."
-		elif (echo "$choice" | grep -q tt)
+		elif (echo "$choice" | egrep -q 'tt[0-9]+')
 		then
 			imdbID=$(echo "$choice" | egrep -o 'tt[0-9]+')
 			imdb_query_title_year_by_id.sh "$imdbID" | tr '\t' '\n' | tee "$movienfo"
 			rm "$imdbCandidatesFile"
 			echo "# Done."
-		elif [ 1 -le "$choice" -a "$choice" -le $N ]
+		elif [ 1 -le $(echo "$choice" | awk '{print 1*$1}') -a $(echo "$choice" | awk '{print 1*$1}') -le $N ]
 		then
 			sed -n "$choice"p "$imdbCandidatesFile" | tr '\t' '\n' | tail -n +2 | tee "$movienfo"
 			rm "$imdbCandidatesFile"
