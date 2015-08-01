@@ -1,0 +1,460 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>YaWiki2Latex: Yet Another MediaWiki to Latex Converter</title>
+<style>
+textarea, input {vertical-align: middle;}
+textarea {width:45%; height:93%;}
+span {color:gray; font-size:8pt;}
+</style>
+</head>
+<body>
+<textarea id="W" autofocus="autofocus">
+LINE START
+== Heading text ==
+=== Heading text ===
+
+* Bulleted list item A
+* Bulleted list item B
+* how to do nested lists?
+
+==== Heading text ====
+# Numbered list item 1
+# Numbered list item 2
+# Numbered list item 3
+not in list
+
+===== Heading text =====
+
+Normal text
+:Indented text
+::Indented text
+
+TAGS
+
+<u>underlined</u>
+
+<s>strike through</s>
+
+<big>Big text</big>
+
+foo<sup>Superscript text</sup>bar
+
+foo<sub>Subscript text</sub>bar
+
+BR <br /> BR
+
+<nowiki>Insert non-formatted text here</nowiki>
+
+Math <math>E=mc^2</math> in Text.
+
+<gallery>
+Example.jpg|Caption1
+Example.jpg|Caption2
+</gallery>
+
+Page text.<ref>[http://www.example.org Link text], additional text.</ref>
+
+Page text.<ref name="test">[http://www.example.org Link text]</ref>
+
+<ref name="test" />
+
+<references />
+
+<syntaxhighlight lang="cpp">
+
+</syntaxhighlight>
+
+
+'''Bold text'''
+
+''Italic text''
+
+
+[[Page title]]
+[[Page title|Link label]]
+
+[http://www.example.org Link label]
+[http://www.example.org]
+http://www.example.org
+
+[[File:Example.png|thumbnail|Caption text]]
+
+[[File:Foobar.jpg|thumbnail|center|The Captain]]
+
+[[File:Foobar.gif|400px|framed|right|Da Caption]]
+
+
+numbered equation:
+
+{{NumBlk|:|<math>E=mc^2</math>|{{EquationRef|2}}}}
+
+numbered equation in box
+
+{{NumBlk|:|{{Equation box 1 |background colour=white |title=<u>energz mass relation</u> |equation = <math>E=mc^2</math>}}|{{EquationRef|3}}}}
+
+{| class="wikitable"
+|-
+! Header text !! Header text !! Header text
+|-
+| Example || Example || Example
+|-
+| Example || Example || Example
+|}
+
+ℝĕŵüǣØøḍẟd͡ʒ‖|¡¿½⅓⅔¼¾⅛⅜⅝⅞∞‘’“„„«»”“”¤¢≈≠≤≥±−×÷←→·§‽~|£₤ζμΣΨψωДиЙйӢӣЍѝҊҋӤӥчЫыӸӹ
+</textarea> 
+<input type="button" value="--&gt;" onClick="go();" /> 
+<textarea id="L" readonly="readonly"></textarea><br/>
+<hr/>
+<span>YaWiki2Latex (Yet Another MediaWiki to Latex Converter). Created by Lars Winterfeld. Licenced under GPLv2.</span>
+
+<script lang="javascript"><!--
+var letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+var cA = 'A'.charCodeAt(0), cZ = 'Z'.charCodeAt(0), ca = 'a'.charCodeAt(0), cz = 'z'.charCodeAt(0);
+function html2tagname(html) // '<BIG>' -> 'big',  '<ref name="foo"/>' -> 'ref',  '</sup>' -> 'sup'
+{
+	for(var i0 = (html[1]=='/' ? 2 : 1), i = i0; i < html.length; ++i)
+	{
+		var cc = html.charCodeAt(i);
+		if( (cc < cA || cc > cZ) && (cc < ca || cc > cz) )
+			return html.substring(i0, i).toLocaleLowerCase();
+	}
+	return '';
+}
+
+function convertTemplate(name, params)
+{
+	;
+}
+
+function convertWiki(T, linestart = true)
+{
+	var outT = '';
+	// split by each <nowiki>, search for </nowiki>
+	// before_nowiki + verbatim(nowiki) + after_wiki
+	var tagrec = '';
+	var opentags = []; // <u>, <big>, '', ''', <sup>, ..., {{, {|, [, [[, ^==, ^===, ^====, ^=====, ^======, ^*, ^#, ^:, ^::
+	var n_enum = 0;
+	var n_list = 0;
+	for(var i = 0; i < T.length; i++)
+	{
+		var c = T[i];
+		var outC = c;
+		var normal_linestart = true;
+		if(linestart) // last line was a newline-char, so c is first char in line
+		{
+			normal_linestart = false;
+			switch(c)
+			{
+				case '=':
+					tagrec = '^=';
+					outC = '';
+					break;
+				
+				case '*':
+					outC = "\\item ";
+					break;
+				
+				case '#':
+					outC = "\\item ";
+					break;
+				
+				case ':': // TODO
+					;
+					break;
+				
+				case '::': // TODO one char cannot == '::'
+					;
+					break;
+				
+				default:
+					normal_linestart = true;
+					break;
+			}
+			if(n_list == 1 && c != '*')
+			{
+				n_list = 0;
+				outC = "\\end{itemize}\n" + outC;
+			}
+			if(n_list == 0 && c == '*')
+			{
+				n_list = 1;
+				outC = "\\begin{itemize}\n" + outC;
+			}
+			if(n_enum == 1 && c != '#')
+			{
+				n_enum = 0;
+				outC = "\\end{enumerate}\n" + outC;
+			}
+			if(n_enum == 0 && c == '#')
+			{
+				n_enum = 1;
+				outC = "\\begin{enumerate}\n" + outC;
+			}
+		}
+		if(normal_linestart)
+		{
+			if(tagrec == '') // normal text, watch out for chars that open a tag:  = < { [ ' &
+			{
+				if(c=='=' || c=='<' || c=='{' || c=='[' || c=='\'' || c=='&') // open possible heading =, html tag <, possible template or table {, link or include [, italic or bold ', html char &
+				{
+					tagrec = c;
+					outC = ''; // silence output
+				}
+			}
+			else // a tag is still open
+			{
+				outC = ''; // we are in tag, so silence output
+				if(tagrec.substr(0,2) == '^=') // headline from line start
+				{
+					if(c == '=') // one more =
+						tagrec += '=';
+					else // no more =, closes tag, heading text follows
+					{
+						opentags.push(tagrec);
+						switch(tagrec)
+						{
+							case '^==':     outC = "\\section{"       + c; break;
+							case '^===':    outC = "\\subsection{"    + c; break;
+							case '^====':   outC = "\\subsubsection{" + c; break;
+							case '^=====':  outC = "\\paragraph{"     + c; break;
+							case '^======': outC = "\\subparagraph{"  + c; break;
+						}
+						tagrec = '';
+					}
+				}
+				switch(tagrec[0])
+				{
+					case '=': // last chars were one or more =
+						if(c == '=') // one more =
+							tagrec += '=';
+						else // no more =, either closes headline tag, or, it was just a harmless = somewhere in the text
+						{
+							if(opentags.length>0 && opentags[opentags.length-1].substr(1) == tagrec)
+							{
+								opentags.pop();
+								outC = '}' + c; // close headline
+								tagrec = ''; // clear tag recording
+							}
+							else
+							{
+								outC = tagrec + c;
+								tagrec = '';
+							}
+						}
+						break;
+					
+					case '<':
+						if(tagrec.length == 1) // (tagrec == '<') last char was <
+						{
+							var cc = c.charCodeAt(0);
+							if( c=='/' || (cA <= cc && cc <= cZ) || (ca <= cc && cc <= cz) ) // html tag must start with a letter, like <u... or with /, like </u...
+							//if(letters.indexOf(c) != -1)
+							{
+								outC = '';
+								tagrec += c;
+							}
+							else // otherwise it was a harmless "smaller than"-sign < in the text
+							{
+								outC = tagrec + c;
+								tagrec = '';
+							}
+						}
+						else // in <html tag..., but last char was not <
+						{
+							tagrec += c;
+							if(c == '>') // html tag closes
+							{
+								if(tagrec.substr(-2)=='/>') // something like <br /> or <ref/> closed: process now and forget about it
+								{
+									var tagname = html2tagname(tagrec);
+									switch(tagname)
+									{
+										case 'br':
+											outC = "\\\\\n"; // "\\vspace{1ex}\n";
+											break;
+										
+										case 'references':
+											outC = "\\thebibliography\n";
+											break;
+										
+										case 'ref':
+											var refname = "?"; // TODO retract name from <ref name="test" />
+											outC = "\\cite{" + refname + "}\n";
+											break;
+										
+										default:
+											outC = "% unknown <tag /> \"" + tagname + "\"\n";
+											break;
+									}
+								}
+								else // tag finished (hitting >), e.g., <big> or <ref name="x" /> or </u>
+								{
+									if(tagrec.substr(0,2) != '</') // opening tag (does not start with </ )
+									{
+										opentags.push(tagrec);
+										var opentagname = html2tagname(tagrec);
+										switch(opentagname)
+										{
+											case 'u':
+												outC = "\\underline{";
+												break;
+											
+											case 's':
+												outC = "\\st{";
+												break;
+											
+											case 'big':
+												outC = "\\begin{large}";
+												break;
+											
+											case 'small':
+												outC = "\\begin{scriptsize}";
+												break;
+											
+											case 'sup':
+												outC = "$^{\\text{";
+												break;
+											
+											case 'sub':
+												outC = "$_{\\text{";
+												break;
+											
+											case 'math':
+												outC = "$";
+												break;
+											
+											default:
+												outC = "% unknown opening <tag> \"" + opentagname + "\"\n";
+												break;
+										}
+									}
+									else // closing tag (starts with </), e.g., </u>, </big>
+									{
+										var closingtagname = html2tagname(tagrec);
+										var opentagname = opentags.length>0 ? html2tagname(opentags[opentags.length-1]) : '';
+										if(opentagname == closingtagname)
+										{
+											var opentaghtml = opentags.pop();
+											switch(closingtagname)
+											{
+												case 'u':
+												case 's':
+													outC = "}";
+													break;
+												
+												case 'big':
+													outC = "\\end{large}";
+													break;
+												
+												case 'small':
+													outC = "\\end{scriptsize}";
+													break;
+												
+												case 'sup':
+												case 'sub':
+													outC = "}}$";
+													break;
+												
+												case 'math':
+													outC = " $";
+													break;
+												
+												default:
+													outC = "% unprocessed closing </tag> \"" + opentagname + "\"\n";
+													break;
+											}
+										}
+										else
+											outC = "% closing </tag> that was never opened \"" + closingtagname + "\"\n";
+									}
+								}
+								tagrec = '';
+							}
+						}
+						break;
+						
+					case '{':
+						;
+						break;
+					
+					case '[':
+						;
+						break;
+					
+					case '\'':
+						;
+						break;
+					
+					case '&':
+						;
+						break;
+					
+					default:
+						// tagrec += c;
+						break;
+				}
+			}
+		}
+		var linestart = (c=='\n' || c=='\r');
+		if(linestart) // reached end of line
+		{
+			if(opentags.length>0 && opentags[opentags.length-1][0] == '^') // line end triggers closing of some open tags
+			{
+				var lineopener = opentags.pop().substr(1); // which tag gets closed
+				// switch(lineopener)
+				if(lineopener[0] == '=') // ==, ===, ====, =====, ======
+				{
+					outC = '}' + c; // close headline
+					tagrec = ''; // clear tag recording
+				}
+			}
+		}
+		/*  Special characters
+		s/([&#_])/\\$1/g;
+		*/
+		outT += outC;
+	}
+	return outT;
+}
+
+/* parsing nightmares
+=== No Heading?
+== = ==
+== Crticial temperature T<sup>c</sup> ==
+<u>foo ''yolo'' bar</u>
+x < u > 3
+<ref
+name="foo" />
+<u>x
+y</u>
+<ref name="a>b" />
+<u><nowiki>foo </u></nowiki>
+<u><math>s</u>t</math></u>
+'''yeah'' oh yeah
+{nothing {happend}} {{really} nothing?}
+{{Template 1|:|{{Template 2 | x}}}}
+{{Template| <math>{a { b }} </math> }}
+</neveropend>
+*/
+
+function go()
+{
+	document.getElementById("L").textContent = '\\documentclass[12pt,a4paper]{article}\n' +
+	'\\usepackage[utf8x]{inputenc}\n' +
+	'\\usepackage{ucs}\n' +
+	'% \\usepackage[german]{babel}\n' +
+	'\\usepackage{amsmath}\n' +
+	'\\usepackage{amsfonts}\n' +
+	'\\usepackage{amssymb}\n' +
+	'\\usepackage{soul}\n' +
+	'\\usepackage{graphicx}\n' +
+	'\\author{WikiBook Authors}\n' +
+	'\\begin{document}\n' + 
+	convertWiki(document.getElementById("W").value) + 
+	"\n\\end{document}\n";
+}
+//--></script>
+</body>
+</html>
