@@ -110,7 +110,6 @@ numbered equation in box
 <span>YaWiki2Latex (Yet Another MediaWiki to Latex Converter). Created by Lars Winterfeld. Licenced under GPLv2.</span>
 
 <script lang="javascript"><!--
-var letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 var cA = 'A'.charCodeAt(0), cZ = 'Z'.charCodeAt(0), ca = 'a'.charCodeAt(0), cz = 'z'.charCodeAt(0);
 function html2tagname(html) // '<BIG>' -> 'big',  '<ref name="foo"/>' -> 'ref',  '</sup>' -> 'sup'
 {
@@ -128,12 +127,38 @@ function convertTemplate(name, params)
 	;
 }
 
+var tex = {
+	'^==':["\\section{", "}"],
+	'^===':["\\subsection{", "}"],
+	'^====':["\\subsubsection{", "}"],
+	'^=====':["\\paragraph{", "}"],
+	'^======':["\\subparagraph{", "}"],
+	'^#':["\\item ", ""],
+	'^*':["\\item ", ""],
+	'^:':["\n\\setlength{\\leftskip}{3em}\n", "\n\\setlength{\\leftskip}{0em}\n"],
+	'^::':["\n\\setlength{\\leftskip}{6em}\n", "\n\\setlength{\\leftskip}{0em}\n"],
+	'itemize':["\\begin{itemize}\n", "\\end{itemize}\n"],
+	'enumerate':["\\begin{enumerate}\n", "\\end{enumerate}\n"],
+	'u':["\\underline{", "}"],
+	's':["\\st{", "}"],
+	'big':["\\begin{large}", "\\end{large}"],
+	'small':["\\begin{scriptsize}", "\\end{scriptsize}"],
+	'sup':["$^{\\text{", "}}$"],
+	'sub':["$_{\\text{", "}}$"],
+	'math':["$", " $"],
+	'br':["\\\\\n", ""],
+	'ref':["\\cite{", "}"],
+	'references':["\\thebibliography\n", ""],
+};
+
 function convertWiki(T, linestart = true)
 {
 	var outT = '';
 	// split by each <nowiki>, search for </nowiki>
 	// before_nowiki + verbatim(nowiki) + after_wiki
-	var tagrec = '';
+	var tagrec = ''; // tag recording buffer
+	var contrec = ''; // content recording buffer, conent is e.g. between <gallery> and </gallery>, need to prases as a whole
+	var contrec_switch = false;
 	var opentags = []; // <u>, <big>, '', ''', <sup>, ..., {{, {|, [, [[, ^==, ^===, ^====, ^=====, ^======, ^*, ^#, ^:, ^::
 	var n_enum = 0;
 	var n_list = 0;
@@ -152,46 +177,24 @@ function convertWiki(T, linestart = true)
 					outC = '';
 					break;
 				
+				case ':': // TODO indentation
+					tagrec = '^:';
+					outC = '';
+					break;
+				
 				case '*':
-					outC = "\\item ";
-					break;
-				
 				case '#':
-					outC = "\\item ";
-					break;
-				
-				case ':': // TODO
-					;
-					break;
-				
-				case '::': // TODO one char cannot == '::'
-					;
+					outC = tex['^*'][0];
 					break;
 				
 				default:
 					normal_linestart = true;
 					break;
 			}
-			if(n_list == 1 && c != '*')
-			{
-				n_list = 0;
-				outC = "\\end{itemize}\n" + outC;
-			}
-			if(n_list == 0 && c == '*')
-			{
-				n_list = 1;
-				outC = "\\begin{itemize}\n" + outC;
-			}
-			if(n_enum == 1 && c != '#')
-			{
-				n_enum = 0;
-				outC = "\\end{enumerate}\n" + outC;
-			}
-			if(n_enum == 0 && c == '#')
-			{
-				n_enum = 1;
-				outC = "\\begin{enumerate}\n" + outC;
-			}
+			if(n_list == 1 && c != '*') { n_list = 0; outC = tex['itemize'][1]   + outC; }
+			if(n_list == 0 && c == '*') { n_list = 1; outC = tex['itemize'][0]   + outC; }
+			if(n_enum == 1 && c != '#') { n_enum = 0; outC = tex['enumerate'][1] + outC; }
+			if(n_enum == 0 && c == '#') { n_enum = 1; outC = tex['enumerate'][0] + outC; }
 		}
 		if(normal_linestart)
 		{
@@ -206,26 +209,23 @@ function convertWiki(T, linestart = true)
 			else // a tag is still open
 			{
 				outC = ''; // we are in tag, so silence output
-				if(tagrec.substr(0,2) == '^=') // headline from line start
-				{
-					if(c == '=') // one more =
-						tagrec += '=';
-					else // no more =, closes tag, heading text follows
-					{
-						opentags.push(tagrec);
-						switch(tagrec)
-						{
-							case '^==':     outC = "\\section{"       + c; break;
-							case '^===':    outC = "\\subsection{"    + c; break;
-							case '^====':   outC = "\\subsubsection{" + c; break;
-							case '^=====':  outC = "\\paragraph{"     + c; break;
-							case '^======': outC = "\\subparagraph{"  + c; break;
-						}
-						tagrec = '';
-					}
-				}
 				switch(tagrec[0])
 				{
+					case '^': // a tag from line start
+						if(tagrec[1] == '=') // headline
+						{
+							if(c == '=') // one more =
+								tagrec += '=';
+							else // no more =, closes tag, heading text follows
+							{
+								opentags.push(tagrec);
+								if(tex[tagrec]) outC = tex[tagrec][0] + c;
+								tagrec = '';
+								contrec_switch = true;
+							}
+						}
+						break;
+					
 					case '=': // last chars were one or more =
 						if(c == '=') // one more =
 							tagrec += '=';
@@ -233,8 +233,8 @@ function convertWiki(T, linestart = true)
 						{
 							if(opentags.length>0 && opentags[opentags.length-1].substr(1) == tagrec)
 							{
-								opentags.pop();
-								outC = '}' + c; // close headline
+								var lineopener = opentags.pop(); // which headline gets closed
+								outC = tex[lineopener][1] + c; // close 
 								tagrec = ''; // clear tag recording
 							}
 							else
@@ -250,7 +250,6 @@ function convertWiki(T, linestart = true)
 						{
 							var cc = c.charCodeAt(0);
 							if( c=='/' || (cA <= cc && cc <= cZ) || (ca <= cc && cc <= cz) ) // html tag must start with a letter, like <u... or with /, like </u...
-							//if(letters.indexOf(c) != -1)
 							{
 								outC = '';
 								tagrec += c;
@@ -280,7 +279,7 @@ function convertWiki(T, linestart = true)
 											break;
 										
 										case 'ref':
-											var refname = "?"; // TODO retract name from <ref name="test" />
+											var refname = "?"; // TODO extract name from <ref name="test" />
 											outC = "\\cite{" + refname + "}\n";
 											break;
 										
@@ -295,40 +294,8 @@ function convertWiki(T, linestart = true)
 									{
 										opentags.push(tagrec);
 										var opentagname = html2tagname(tagrec);
-										switch(opentagname)
-										{
-											case 'u':
-												outC = "\\underline{";
-												break;
-											
-											case 's':
-												outC = "\\st{";
-												break;
-											
-											case 'big':
-												outC = "\\begin{large}";
-												break;
-											
-											case 'small':
-												outC = "\\begin{scriptsize}";
-												break;
-											
-											case 'sup':
-												outC = "$^{\\text{";
-												break;
-											
-											case 'sub':
-												outC = "$_{\\text{";
-												break;
-											
-											case 'math':
-												outC = "$";
-												break;
-											
-											default:
-												outC = "% unknown opening <tag> \"" + opentagname + "\"\n";
-												break;
-										}
+										if(tex[opentagname]) outC = tex[opentagname][0];
+										else outC = "% unknown opening <tag> \"" + opentagname + "\"\n";
 									}
 									else // closing tag (starts with </), e.g., </u>, </big>
 									{
@@ -337,34 +304,8 @@ function convertWiki(T, linestart = true)
 										if(opentagname == closingtagname)
 										{
 											var opentaghtml = opentags.pop();
-											switch(closingtagname)
-											{
-												case 'u':
-												case 's':
-													outC = "}";
-													break;
-												
-												case 'big':
-													outC = "\\end{large}";
-													break;
-												
-												case 'small':
-													outC = "\\end{scriptsize}";
-													break;
-												
-												case 'sup':
-												case 'sub':
-													outC = "}}$";
-													break;
-												
-												case 'math':
-													outC = " $";
-													break;
-												
-												default:
-													outC = "% unprocessed closing </tag> \"" + opentagname + "\"\n";
-													break;
-											}
+											if(tex[closingtagname]) outC = tex[closingtagname][1];
+											else outC = "% unprocessed closing </tag> \"" + opentagname + "\"\n";
 										}
 										else
 											outC = "% closing </tag> that was never opened \"" + closingtagname + "\"\n";
@@ -397,17 +338,17 @@ function convertWiki(T, linestart = true)
 				}
 			}
 		}
+		if(contrec_switch) contrec += c; // continue content recording
 		var linestart = (c=='\n' || c=='\r');
 		if(linestart) // reached end of line
 		{
 			if(opentags.length>0 && opentags[opentags.length-1][0] == '^') // line end triggers closing of some open tags
 			{
-				var lineopener = opentags.pop().substr(1); // which tag gets closed
-				// switch(lineopener)
-				if(lineopener[0] == '=') // ==, ===, ====, =====, ======
+				var lineopener = opentags.pop(); // which tag gets closed
+				if(tex[lineopener])
 				{
-					outC = '}' + c; // close headline
-					tagrec = ''; // clear tag recording
+					outC = tex[lineopener][1] + c;
+					tagrec = ''; // saftey measure: clear tag recording
 				}
 			}
 		}
@@ -421,8 +362,11 @@ function convertWiki(T, linestart = true)
 
 /* parsing nightmares
 === No Heading?
+==X==
 == = ==
+==> ok
 == Crticial temperature T<sup>c</sup> ==
+some_text {that is} not escaped
 <u>foo ''yolo'' bar</u>
 x < u > 3
 <ref

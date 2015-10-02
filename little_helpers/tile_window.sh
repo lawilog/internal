@@ -7,6 +7,11 @@ subH=24
 deskDim=$( wmctrl -d | grep '*' | awk '{print $9}' )
 
 case $deskDim in
+	3840x1055)
+		deskW=(1920 1920)
+		deskH=(1055 1080)
+	;;
+
 	2880x995)
 		deskW=(1280 1600)
 		deskH=( 995  900)
