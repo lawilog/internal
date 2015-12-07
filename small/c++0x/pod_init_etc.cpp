@@ -32,6 +32,9 @@ int main()
 	
 	delete [] array;
 	delete A;
+
+	int n {42};
+	int m {2.3};
 	
 	return 0;
 }
