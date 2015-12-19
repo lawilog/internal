@@ -43,6 +43,18 @@ result_type (*magic_wrapper(const function<result_type(argument_type)>& functor)
 	return myfunctor_wrapper<ID,result_type,argument_type>;
 }
 
+/*
+problem:
+   the result of lambdas and bind()s, etc. is an object that (in general) contains a state
+   obj(x) is actually obj.operator(x), similar to a c-function class::operator(obj, x)
+   this object can be transfered into a std::function, but (in general) not back to
+   a c-style function pointer, which expects only x and does not know about obj
+solution:
+   the trick here is to reserve a space for a each required function on compile time (label them by ID)
+   we can get a c-style pointer to such a function on compile time (based on it's ID)
+   but what this function does is evaluating obj(x), where obj can be assigned on runtime
+*/
+
 int main()
 {
 	cout<<"libfunction(myfun): "<< libfunction(myfun) <<endl;
