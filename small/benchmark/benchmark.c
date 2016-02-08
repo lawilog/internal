@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 #include <time.h>
 
 #ifndef uint64_t
@@ -14,6 +15,7 @@ struct thread_data
 	uint64_t my_start_ind;
 	uint64_t my_end_ind;
 	double f_shuffle;
+	unsigned n_ops;
 	double sum;
 };
 typedef struct thread_data thread_data;
@@ -21,8 +23,9 @@ typedef struct thread_data thread_data;
 const unsigned max_chunks = 2700;
 const unsigned chunks_size = 104857600 / (sizeof(double) + sizeof(uint64_t)); // 104857600 = 100MB
 
-void thread_init(struct thread_data* data)
+void* thread_init(void* vdata)
 {
+	thread_data* data = (thread_data*) vdata;
 	uint64_t chunk, elemt;
 	for(uint64_t i = data->my_start_ind; i < data->my_end_ind; ++i)
 	{
@@ -46,11 +49,14 @@ void thread_init(struct thread_data* data)
 		data->ind_chunks[chunk2][elemt2] = k;
 		k = kk;
 	}
+	return NULL;
 }
 
-void thread_run(struct thread_data* data)
+void* thread_run(void* vdata)
 {
-	double xi;
+	thread_data* data = (thread_data*) vdata;
+	const unsigned n_ops = data->n_ops;
+	double xi, x, xx, D;
 	uint64_t chunk, elemt, ind;
 	for(uint64_t i = data->my_start_ind; i < data->my_end_ind; ++i)
 	{
@@ -60,24 +66,20 @@ void thread_run(struct thread_data* data)
 		chunk = ind / chunks_size;
 		elemt = ind % chunks_size;
 		xi = data->data_chunks[chunk][elemt];
-		data->sum += xi * xi;
-	}
-	
-	// TODO compute more
-	/*unsigned long n;
-	float x, xx, err = 0.0;
-	for(n = 1; n < N; ++n)
-	{
-		x = n;
-		while(x > 1.5)
+		D = 0.0;
+		for(unsigned n = 1; n < n_ops; ++n)
 		{
-			xx = x / 2.0;
-			if(xx - (unsigned long)(xx) > 0.25 ) x = 3.0*x + 1.0;
-			else x = xx;
+			x = n;
+			while(x > 1.5)
+			{
+				xx = x / 2.0;
+				x = (xx - (unsigned long)(xx) > 0.25 ) ? 3.0*x + 1.0 : xx;
+			}
+			D += x - 1.0;
 		}
-		err += x>1.0 ? 1.0-x : x-1.0;
+		data->sum += xi * xi + D;
 	}
-	printf("err = %e\n", err);*/
+	return NULL;
 }
 
 int main(int argc, char** argv)
@@ -101,7 +103,7 @@ int main(int argc, char** argv)
 		printf("TotalMem must be <= %u\n", max_chunks);
 		return 1;
 	}
-	printf("%u threads, %4.1f GB, calc %u, disorder %f\n", n_threads, 0.1*n_chunks, n_ops, f_shuffle);
+	printf("%u threads, total mem %4.1f GB, calc %u, disorder %f\n", n_threads, 0.1*n_chunks, n_ops, f_shuffle);
 	
 	clock_t t0 = clock(), t1, t2;
 	
@@ -116,8 +118,9 @@ int main(int argc, char** argv)
 		data_chunks[c] = (double*) malloc(sizeof(double) * chunks_size);
 		ind_chunks[c]  = (uint64_t*) malloc(sizeof(uint64_t) * chunks_size);
 	}
-	uint64_t ind = 0;
+	pthread_t* pthreads = (pthread_t*) malloc(sizeof(pthread_t) * n_threads);
 	thread_data* thread_dats = (thread_data*) malloc(sizeof(thread_data) * n_threads);
+	uint64_t ind = 0;
 	for(unsigned t = 0; t < n_threads; ++t)
 	{
 		thread_dats[t].data_chunks = data_chunks;
@@ -126,23 +129,28 @@ int main(int argc, char** argv)
 		thread_dats[t].my_start_ind = ind; ind += elements_per_thread;
 		thread_dats[t].my_end_ind   = ind; ++ind;
 		thread_dats[t].f_shuffle = f_shuffle;
+		thread_dats[t].n_ops = n_ops;
 		thread_dats[t].sum = 0.0;
 		// printf("Thread %u from %llu to %llu.\n", t, thread_dats[t].my_start_ind, thread_dats[t].my_end_ind);
 	}
 	thread_dats[n_threads-1].my_end_ind = n_elements;
 	
-	// TODO: really start threads
-	
 	// init data
 	for(unsigned t = 0; t < n_threads; ++t)
-		thread_init(& thread_dats[t]);
+		pthread_create(&pthreads[t], NULL, thread_init, & thread_dats[t]);
+	
+	for(unsigned t = 0; t < n_threads; ++t)
+		pthread_join(pthreads[t], NULL);
 	
 	t1 = clock();
 	
 	// perform calculation
 	printf("Integrating... ");
 	for(unsigned t = 0; t < n_threads; ++t)
-		thread_run(& thread_dats[t]);
+		pthread_create(&pthreads[t], NULL, thread_run, & thread_dats[t]);
+	
+	for(unsigned t = 0; t < n_threads; ++t)
+		pthread_join(pthreads[t], NULL);
 	
 	double s = 0.0;
 	for(unsigned t = 0; t < n_threads; ++t)
@@ -154,13 +162,14 @@ int main(int argc, char** argv)
 	
 	// free memory
 	free(thread_dats);
+	free(pthreads);
 	for(unsigned c = n_chunks; c > 0; --c)
 	{
 		free(ind_chunks[c-1]);
 		free(data_chunks[c-1]);
 	}
 	
-	printf("Time init: %10.3f, calc: %10.3f\n", (double)(t1-t0)/CLOCKS_PER_SEC, (double)(t2-t1)/CLOCKS_PER_SEC);
+	printf("cpu time: %10.3f init, %10.3f calc\n", (double)(t1-t0)/CLOCKS_PER_SEC, (double)(t2-t1)/CLOCKS_PER_SEC);
 	
 	return 0;
 }
