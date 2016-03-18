@@ -27,6 +27,7 @@ void* thread_init(void* vdata)
 	thread_data* const data = (thread_data*) vdata;
 	double* const X = data -> X;
 	uint64_t* const ind = data -> ind;
+	const double h = data->h;
 	const uint64_t my_start_ind = data -> my_start_ind;
 	const uint64_t my_end_ind = data -> my_end_ind;
 	const uint64_t n_thread_elements = my_end_ind - my_start_ind;
@@ -34,7 +35,7 @@ void* thread_init(void* vdata)
 	for(uint64_t i = my_start_ind; i < my_end_ind; ++i)
 	{
 		ind[i] = i;
-		X[i] = i * data->h;
+		X[i] = i * h;
 	}
 	for(uint64_t kk, k = 0, s = 0; s < n_shuffle; ++s)
 	{
