@@ -6,3 +6,6 @@ lhs_list(L) := map(lambda([_e], lhs(_e)), L)$
 
 filter(L,cond,var) := sublist(L,lambda([_e],subst(_e,var,cond)))$
 
+grad(f, r) := [diff(f,r[1]), diff(f,r[2]), diff(f,r[3])];
+div(f, r) := diff(f[1], r[1]) + diff(f[2], r[2]) + diff(f[3], r[3]);
+rot(f, r) := [diff(f[3], r[2]) - diff(f[2], r[3]), diff(f[1], r[3]) - diff(f[3], r[1]), diff(f[2], r[1]) - diff(f[1], r[2])];
