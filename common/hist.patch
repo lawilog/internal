@@ -1,0 +1,24 @@
+--- /usr/app-soft/octave/v4.0.0-1/share/octave/4.0.0/m/plot/draw/hist.m	2015-10-09 17:40:51.498753038 +0200
++++ hist.m	2015-10-22 10:17:59.352435667 +0200
+@@ -26,8 +26,9 @@
+ ## @deftypefnx {Function File} {[@var{nn}, @var{xx}] =} hist (@dots{})
+ ## Produce histogram counts or plots.
+ ##
+-## With one vector input argument, @var{y}, plot a histogram of the values
+-## with 10 bins.  The range of the histogram bins is determined by the
++## With one vector input argument, @var{y}, plot a histogram of the values,
++## where the number of bins is determined by Freedman-Diaconis' choice.
++## The range of the histogram bins is determined by the
+ ## range of the data.  With one matrix input argument, @var{y}, plot a
+ ## histogram where each bin contains a bar per input column.
+ ##
+@@ -99,7 +100,8 @@
+ 
+   iarg = 1;
+   if (nargin == 1 || ischar (varargin{iarg}))
+-    n = 10;
++    h = 2*iqr(y) / length(y)^(1/3); % Freedman-Diaconis' choice
++    n = round( (max_val - min_val) / h );
+     x = [0.5:n]'/n;
+     x = x * (max_val - min_val) + ones (size (x)) * min_val;
+   else
