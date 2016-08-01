@@ -3,6 +3,7 @@
 
 #include <random>
 #include <functional>
+#include <valarray>
 
 namespace LW {
 
@@ -22,6 +23,15 @@ class RandDistrib
 		number_type operator() ()
 		{
 			return F(generator);
+		}
+		
+		std::valarray<number_type> operator() (std::size_t n)
+		{
+			std::valarray<number_type> v(n);
+			for(std::size_t i = 0; i < n; ++i)
+				v[i] = F(generator);
+			
+			return v;
 		}
 };
 
