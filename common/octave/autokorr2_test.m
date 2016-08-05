@@ -28,3 +28,4 @@ figure(2); imagesc(autokov2 (D, 8, 8));        colorbar; colormap jet; title('au
 figure(3); imagesc(autokorr2(D, 8, 8));        colorbar; colormap jet; title('autokorr2');
 figure(4); imagesc(autokorr2_approx(D, 8, 8)); colorbar; colormap jet; title('autokorr2 approx');
 figure(5); imagesc(autokov2_approx(D, 8, 8));  colorbar; colormap jet; title('autokov2 approx');
+figure(6); X = xcorr2(D); Xh = ceil(size(X)/2); imagesc(X(Xh(1):end,Xh(2):end)); colorbar; colormap jet; title('xcorr2');
