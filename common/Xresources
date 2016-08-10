@@ -1,0 +1,13 @@
+gnuplot*background: white
+
+gnuplot*line1Color: #396AB1
+gnuplot*line2Color: #DA7C30
+gnuplot*line3Color: #3E9651
+gnuplot*line4Color: #CC2529
+gnuplot*line5Color: #535154
+gnuplot*line6Color: #6B4C9A
+gnuplot*line7Color: #922428
+gnuplot*line8Color: #948B3D
+gnuplot*line9Color: #FF00FF
+gnuplot*line10Color: #00DDDD
+
