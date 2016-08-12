@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <array>
+#include "printf++.hpp"
 
 namespace LW {
 
@@ -20,9 +21,21 @@ class array3d
 		array3d(size_t nx, size_t ny, size_t nz) : flat(nx*ny*nz), n({nx, ny, nz}) {nn = ny*nz;};
 		
 		inline T& operator()       (size_t i, size_t j, size_t k) noexcept       {return flat[nn*i+n[2]*j+k];}
-		inline T& at               (size_t i, size_t j, size_t k)                {return flat.at(nn*i+n[2]*j+k);}
 		inline const T& operator() (size_t i, size_t j, size_t k) const noexcept {return flat[nn*i+n[2]*j+k];}
-		inline const T& at         (size_t i, size_t j, size_t k) const          {return flat.at(nn*i+n[2]*j+k);}
+		inline T& at               (size_t i, size_t j, size_t k)
+		{
+			if(i >= n[0]) throw std::out_of_range(strprintf("array3d: first index (which is %u) out of range (%u)", i, n[0]));
+			if(j >= n[1]) throw std::out_of_range(strprintf("array3d: second index (which is %u) out of range (%u)", j, n[1]));
+			if(k >= n[2]) throw std::out_of_range(strprintf("array3d: third index (which is %u) out of range (%u)", k, n[2]));
+			return flat.at(nn*i+n[2]*j+k);
+		}
+		inline const T& at         (size_t i, size_t j, size_t k) const
+		{
+			if(i >= n[0]) throw std::out_of_range(strprintf("array3d: first index (which is %u) out of range (%u)", i, n[0]));
+			if(j >= n[1]) throw std::out_of_range(strprintf("array3d: second index (which is %u) out of range (%u)", j, n[1]));
+			if(k >= n[2]) throw std::out_of_range(strprintf("array3d: third index (which is %u) out of range (%u)", k, n[2]));
+			return flat.at(nn*i+n[2]*j+k);
+		}
 		
 		inline const std::array<size_t,3>& size() const {return n;}
 		

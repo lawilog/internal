@@ -16,5 +16,10 @@ int main(int argc, char** argv)
 	for(unsigned m = 0; m < 33; ++m)
 		cout<< a.at(m, 0, 0) <<endl;
 	
+	cout<<"Good. Now the following should throw an error:"<<endl;
+	a.resize(5, 3, 2);
+	cout<< a(1, 2, 3) <<endl; // works, because there are enough elements
+	cout<< a.at(1, 2, 3) <<endl; // but 3 > 2!
+	
 	return 0;
 }

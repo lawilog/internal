@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <array>
+#include <stdexcept>
+#include "printf++.hpp"
 
 namespace LW {
 
@@ -19,9 +21,19 @@ class array2d
 		array2d(size_t nx, size_t ny) : flat(nx*ny), n({nx, ny}) {};
 		
 		inline T& operator()       (size_t i, size_t j) noexcept       {return flat[n[1]*i+j];}
-		inline T& at               (size_t i, size_t j)                {return flat.at(n[1]*i+j);}
 		inline const T& operator() (size_t i, size_t j) const noexcept {return flat[n[1]*i+j];}
-		inline const T& at         (size_t i, size_t j) const          {return flat.at(n[1]*i+j);}
+		inline T& at               (size_t i, size_t j)
+		{
+			if(i >= n[0]) throw std::out_of_range(strprintf("array2d: first index (which is %u) out of range (%u)", i, n[0]));
+			if(j >= n[1]) throw std::out_of_range(strprintf("array2d: second index (which is %u) out of range (%u)", j, n[1]));
+			return flat.at(n[1]*i+j);
+		}
+		inline const T& at         (size_t i, size_t j) const
+		{
+			if(i >= n[0]) throw std::out_of_range(strprintf("array2d: first index (which is %u) out of range (%u)", i, n[0]));
+			if(j >= n[1]) throw std::out_of_range(strprintf("array2d: second index (which is %u) out of range (%u)", j, n[1]));
+			return flat.at(n[1]*i+j);
+		}
 		
 		inline const std::array<size_t,2>& size() const noexcept {return n;}
 		
