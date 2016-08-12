@@ -49,6 +49,17 @@ add_executable(align_as_table
 	LineArray.cpp
 )
 
+add_executable(array2d_testcase
+    array2d_testcase.cpp
+)
+
+add_executable(array3d_testcase
+    array3d_testcase.cpp
+)
+
+add_executable(array3d_benchmark
+    array3d_benchmark.cpp
+)
 
 # add_executable(buffer_test buffer_test.cpp)
 add_executable(cout_vector_test cout_vector_test.cpp)
