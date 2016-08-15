@@ -16,7 +16,7 @@ class array2d
 		std::array<size_t,2> n;
 	
 	public:
-		array2d() {};
+		array2d() {n = {0, 0};};
 		array2d(std::array<size_t,2> _n) : flat(_n[0]*_n[1]), n(_n) {};
 		array2d(size_t nx, size_t ny) : flat(nx*ny), n({nx, ny}) {};
 		
@@ -40,8 +40,9 @@ class array2d
 		void resize(size_t nx, size_t ny) {flat.resize(nx*ny); n[0] = nx; n[1] = ny;}
 		void resize(std::array<size_t,2> _n) {flat.resize(_n[0]*_n[1]); n = _n;}
 		
-		inline T* flat_begin() const {return flat.begin();}
-		inline T* flat_end() const {return flat.end();}
+		inline typename std::vector<T>::iterator flat_begin() {return flat.begin();}
+		inline typename std::vector<T>::iterator flat_end() {return flat.end();}
+		inline const std::vector<T>& flat_ref() const {return flat;}
 };
 
 }
