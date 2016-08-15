@@ -1,5 +1,5 @@
-#ifndef _LW_VOUT_
-#define _LW_VOUT_
+#ifndef _LW_VAOUT_
+#define _LW_VAOUT_
 
 #include <iostream>
 #include <valarray>
@@ -38,4 +38,4 @@ cout<< v <<endl;
 
 }
 
-#endif // _LW_VOUT_
+#endif // _LW_VAOUT_

@@ -14,5 +14,10 @@ FunInterpolTable_testcase
 bytes2str_testcase
 EigenOctave_testcase
 lsqnonneg_test
+lscov_testcase
+array2d_testcase
+array3d_benchmark
+array3d_testcase
+rand_choose_testcase
 
 function_interpolation_table_*.dat
