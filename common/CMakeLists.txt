@@ -61,6 +61,10 @@ add_executable(array3d_benchmark
     array3d_benchmark.cpp
 )
 
+add_executable(arraynd_benchmark
+    array3d_benchmark.cpp
+)
+
 add_executable(rand_choose_testcase
     rand_choose_testcase.cpp
 )

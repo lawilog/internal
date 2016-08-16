@@ -1,0 +1,9 @@
+// rechts? rekursion
+f(0) = 1
+f(n) = n*(n-1)
+
+// links? rekursion, "tail recursion"
+f(n) = h(n, n)
+h(0, 0) = 1
+h(p, 1) = p
+h(p, n) = h(p*(n-1), n-1)

@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <array>
-#include <iostream>
 #include "printf++.hpp"
 
 namespace LW {
@@ -47,6 +46,11 @@ class arraynd
 				if(ind[dim] >= n[dim])
 					throw std::out_of_range(strprintf("arraynd<%u>: index %u (which is %u) is out of range (%u)", N, dim, ind[dim], n[dim]));
 		}
+		
+		inline size_t flat_index(const std::array<size_t,N>& ind)
+		{
+			return arraynd_<N-1>::flat_index(&n[0], &ind[0]);
+		}
 	
 	public:
 		arraynd()
@@ -58,21 +62,21 @@ class arraynd
 		
 		inline T& operator()       (const std::array<size_t,N>& ind) noexcept
 		{
-			return flat[arraynd_<N-1>::flat_index(&n[0], &ind[0])];
+			return flat[flat_index(ind)];
 		}
 		inline const T& operator() (const std::array<size_t,N>& ind) const noexcept
 		{
-			return flat[arraynd_<N-1>::flat_index(&n[0], &ind[0])];
+			return flat[flat_index(ind)];
 		}
 		inline T& at               (const std::array<size_t,N>& ind)
 		{
 			check_ind(ind);
-			return flat.at(arraynd_<N-1>::flat_index(&n[0], &ind[0]));
+			return flat.at(flat_index(ind));
 		}
 		inline const T& at         (const std::array<size_t,N>& ind) const
 		{
 			check_ind(ind);
-			return flat.at(arraynd_<N-1>::flat_index(&n[0], &ind[0]));
+			return flat.at(flat_index(ind));
 		}
 		
 		inline const std::array<size_t,N>& size() const {return n;}
