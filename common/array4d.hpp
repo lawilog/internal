@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <array>
+#include <iostream>
 #include "printf++.hpp"
 
 namespace LW {
@@ -13,37 +14,44 @@ class array4d
 	private:
 		std::vector<T> flat;
 		std::array<size_t,4> n;
-		size_t n2;
-		size_t n3;
-	
-	public:
-		array4d() {n = {0, 0, 0, 0}; n2 = 0; n3 = 0;};
-		array4d(std::array<size_t,4> _n) : flat(_n[0]*_n[1]*_n[2]*_n[3]), n(_n) {n2 = _n[1]*_n[2]; n3 = _n[1]*_n[2]*_n[3];};
-		array4d(size_t nx, size_t ny, size_t nz, size_t nu) : flat(nx*ny*nz*nu), n({nx, ny, nz, nu}) {n2 = ny*nz*nu; n3 = ny*nz*nu;};
-		
-		inline T& operator()       (size_t i, size_t j, size_t k, size_t l) noexcept       {return flat[n3*i+n2*j+n[3]*k+l];}
-		inline const T& operator() (size_t i, size_t j, size_t k, size_t l) const noexcept {return flat[n3*i+n2*j+n[3]*k+l];}
-		inline T& at               (size_t i, size_t j, size_t k, size_t l)
+		size_t n32;
+		size_t n321;
+		inline void check_ind(size_t i, size_t j, size_t k, size_t l) const
 		{
 			if(i >= n[0]) throw std::out_of_range(strprintf("array4d: first index (which is %u) out of range (%u)", i, n[0]));
 			if(j >= n[1]) throw std::out_of_range(strprintf("array4d: second index (which is %u) out of range (%u)", j, n[1]));
 			if(k >= n[2]) throw std::out_of_range(strprintf("array4d: third index (which is %u) out of range (%u)", k, n[2]));
 			if(l >= n[3]) throw std::out_of_range(strprintf("array4d: fourth index (which is %u) out of range (%u)", l, n[3]));
-			return flat.at(n3*i+n2*j+n[3]*k+l);
+		}
+		inline size_t flatind(size_t i, size_t j, size_t k, size_t l) {return n321*i+n32*j+n[3]*k+l;}
+	
+	public:
+		array4d() : array4d(0, 0, 0, 0) {};
+		array4d(std::array<size_t,4> n) : array4d(n[0], n[1], n[2], n[3]) {};
+		array4d(size_t n0, size_t n1, size_t n2, size_t n3) : flat(n0*n1*n2*n3), n({n0, n1, n2, n3}), n32(n3*n2), n321(n3*n2*n1) {};
+		
+		inline T& operator()       (size_t i, size_t j, size_t k, size_t l) noexcept       {return flat[flatind(i, j, k, l)];}
+		inline const T& operator() (size_t i, size_t j, size_t k, size_t l) const noexcept {return flat[flatind(i, j, k, l)];}
+		inline T& at               (size_t i, size_t j, size_t k, size_t l)
+		{
+			check_ind(i, j, k, l);
+			return flat.at(flatind(i, j, k, l));
 		}
 		inline const T& at         (size_t i, size_t j, size_t k, size_t l) const
 		{
-			if(i >= n[0]) throw std::out_of_range(strprintf("array4d: first index (which is %u) out of range (%u)", i, n[0]));
-			if(j >= n[1]) throw std::out_of_range(strprintf("array4d: second index (which is %u) out of range (%u)", j, n[1]));
-			if(k >= n[2]) throw std::out_of_range(strprintf("array4d: third index (which is %u) out of range (%u)", k, n[2]));
-			if(l >= n[3]) throw std::out_of_range(strprintf("array4d: fourth index (which is %u) out of range (%u)", l, n[3]));
-			return flat.at(n3*i+n2*j+n[3]*k+l);
+			check_ind(i, j, k, l);
+			return flat.at(flatind(i, j, k, l));
 		}
 		
 		inline const std::array<size_t,4>& size() const {return n;}
 		
-		void resize(size_t nx, size_t ny, size_t nz, size_t nu) {flat.resize(nx*ny*nz*nu); n[0] = nx; n[1] = ny; n[2] = nz; n[3] = nu; n2 = ny*nz; n3 = ny*nz*nu;}
-		void resize(std::array<size_t,4> _n) {flat.resize(_n[0]*_n[1]*_n[2]*_n[3]); n = _n; n2 = _n[1]*_n[2]; n3 = _n[1]*_n[2]*_n[3];}
+		void resize(size_t n0, size_t n1, size_t n2, size_t n3)
+		{
+			flat.resize(n0 * n1 * n2 * n3);
+			n[0] = n0; n[1] = n1; n[2] = n2; n[3] = n3;
+			n32 = n3*n2; n321 = n3*n2*n1;
+		}
+		void resize(std::array<size_t,4> n) {this->resize(n[0], n[1], n[2], n[3]);}
 		
 		inline typename std::vector<T>::iterator flat_begin() {return flat.begin();}
 		inline typename std::vector<T>::iterator flat_end() {return flat.end();}

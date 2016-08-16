@@ -69,6 +69,10 @@ add_executable(sum_testcase
     sum_testcase.cpp
 )
 
+add_executable(arraynd_testcase
+    arraynd_testcase.cpp
+)
+
 # add_executable(buffer_test buffer_test.cpp)
 add_executable(cout_vector_test cout_vector_test.cpp)
 add_executable(parse_testcase parse_testcase.cpp)

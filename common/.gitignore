@@ -19,5 +19,7 @@ array2d_testcase
 array3d_benchmark
 array3d_testcase
 rand_choose_testcase
+sum_testcase
+arraynd_testcase
 
 function_interpolation_table_*.dat
