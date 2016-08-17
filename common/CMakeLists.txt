@@ -62,7 +62,11 @@ add_executable(array3d_benchmark
 )
 
 add_executable(arraynd_benchmark
-    array3d_benchmark.cpp
+    arraynd_benchmark.cpp
+)
+
+add_executable(arraynd_testcase
+    arraynd_testcase.cpp
 )
 
 add_executable(rand_choose_testcase
@@ -71,10 +75,6 @@ add_executable(rand_choose_testcase
 
 add_executable(sum_testcase
     sum_testcase.cpp
-)
-
-add_executable(arraynd_testcase
-    arraynd_testcase.cpp
 )
 
 # add_executable(buffer_test buffer_test.cpp)

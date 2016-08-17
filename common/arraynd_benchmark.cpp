@@ -30,13 +30,13 @@ int main(int argc, char** argv)
 	if(mode == 1)
 	{
 		cout<<"mode arraynd<int,3>"<<endl;
-		array3d<int> a({Nx, Ny, Nz});
+		arraynd<int,3> a({Nx, Ny, Nz});
 		for(unsigned i = 0, x = 0; i < Nx; ++i, x=(x+15)%Nx)
 			for(unsigned j = 0, y = 0; j < Ny; ++j, y=(y+15)%Ny)
 				for(unsigned k = 0, z = 0; k < Nz; ++k, z=(z+15)%Nz)
-					a({x, y, z}) += i + j + k;
+					a(x, y, z) += i + j + k;
 		
-		cout<<"a("<< ci <<","<< cj <<","<< ck <<") = "<< a({ci, cj, ck}) <<endl;
+		cout<<"a("<< ci <<","<< cj <<","<< ck <<") = "<< a(ci, cj, ck) <<endl;
 	}
 	else
 	{

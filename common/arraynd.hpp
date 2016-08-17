@@ -3,35 +3,11 @@
 
 #include <vector>
 #include <array>
+#include <functional>
+#include <numeric>
 #include "printf++.hpp"
 
 namespace LW {
-	
-template<unsigned k>
-struct arraynd_
-{
-	static inline size_t flat_index(const size_t* n, const size_t* i)
-	{
-		return i[k] + n[k] * arraynd_<k-1>::flat_index(n, i);
-	}
-	static inline size_t prod(const size_t* a)
-	{
-		return a[k] * arraynd_<k-1>::prod(a);
-	}
-};
-
-template<>
-struct arraynd_<0>
-{
-	static inline size_t flat_index(const size_t* n, const size_t* i)
-	{
-		return i[0];
-	}
-	static inline size_t prod(const size_t* a)
-	{
-		return a[0];
-	}
-};
 
 template<class T, unsigned N>
 class arraynd
@@ -40,50 +16,62 @@ class arraynd
 		std::vector<T> flat;
 		std::array<size_t,N> n;
 		
-		inline void check_ind(const std::array<size_t,N>& ind) const
+		inline void check_ind() const {}
+		
+		template<typename... Ind>
+		inline void check_ind(size_t i, Ind... ind) const
 		{
-			for(unsigned dim = 0; dim < N; ++dim)
-				if(ind[dim] >= n[dim])
-					throw std::out_of_range(strprintf("arraynd<%u>: index %u (which is %u) is out of range (%u)", N, dim, ind[dim], n[dim]));
+			static const unsigned k = N - 1 - sizeof...(Ind);
+			if(i >= n[k])
+				throw std::out_of_range(strprintf("arraynd<%u>: index %u (which is %u) is out of range (%u)", N, k, i, n[k]));
+			check_ind(ind...);
 		}
 		
-		inline size_t flat_index(const std::array<size_t,N>& ind)
+		inline size_t flat_index()
 		{
-			return arraynd_<N-1>::flat_index(&n[0], &ind[0]);
+			return 0;
+		}
+		
+		template<typename... Ind>
+		inline size_t flat_index(size_t i, Ind... ind)
+		{
+			return i * accumulate(&n[N - sizeof...(Ind)], n.end(), 1, std::multiplies<size_t>()) + flat_index(ind...);
 		}
 	
 	public:
-		arraynd()
-		{
-			for(unsigned dim = 0; dim < N; ++dim)
-				n[dim] = 0;
-		}
-		arraynd(std::array<size_t,N> _n) : flat(arraynd_<N-1>::prod(&_n[0])), n(_n) {}
+		arraynd() { std::fill(n.begin(), n.end(), 0); }
+		arraynd(std::array<size_t,N> _n) :
+			flat( std::accumulate(_n.begin(), _n.end(), 1, std::multiplies<size_t>()) ),
+			n(_n) {}
 		
-		inline T& operator()       (const std::array<size_t,N>& ind) noexcept
+		template<typename... Ind>
+		inline T& operator()       (Ind... ind) noexcept
 		{
-			return flat[flat_index(ind)];
+			return flat[flat_index(ind...)];
 		}
-		inline const T& operator() (const std::array<size_t,N>& ind) const noexcept
+		template<typename... Ind>
+		inline const T& operator() (Ind... ind) const noexcept
 		{
-			return flat[flat_index(ind)];
+			return flat[flat_index(ind...)];
 		}
-		inline T& at               (const std::array<size_t,N>& ind)
+		template<typename... Ind>
+		inline T& at               (Ind... ind)
 		{
-			check_ind(ind);
-			return flat.at(flat_index(ind));
+			check_ind(ind...);
+			return flat.at(flat_index(ind...));
 		}
-		inline const T& at         (const std::array<size_t,N>& ind) const
+		template<typename... Ind>
+		inline const T& at         (Ind... ind) const
 		{
-			check_ind(ind);
-			return flat.at(flat_index(ind));
+			check_ind(ind...);
+			return flat.at(flat_index(ind...));
 		}
 		
 		inline const std::array<size_t,N>& size() const {return n;}
 		
 		void resize(const std::array<size_t,N>& _n)
 		{
-			flat.resize(arraynd_<N-1>::prod(&_n[0]));
+			flat.resize( std::accumulate(_n.begin(), _n.end(), 1, std::multiplies<size_t>()) );
 			n = _n;
 		}
 		

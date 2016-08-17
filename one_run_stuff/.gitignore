@@ -4,3 +4,5 @@ matrix_multiply
 matrix_multiply_threads
 multiarray
 vector_vs_array
+std_minus
+flatindex
