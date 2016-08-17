@@ -11,6 +11,7 @@ int main()
 	vector<int> v(111, 7);
 	int s = sum(v.begin(), v.end());
 	cout<< s <<endl;
+	cout<< sum(v) <<endl;
 	
 	
 	const unsigned N = 5;
