@@ -30,10 +30,7 @@ class arraynd
 		template<typename... Ind>
 		inline void check_ind(Ind... ind) const
 		{
-			if(N != sizeof...(Ind))
-				throw std::invalid_argument("arraynd<"+ std::to_string(N) + ">: needs exactly "+ std::to_string(N) + " indices, got "+ std::to_string(sizeof...(Ind)));
-			
-			check_range(ind...);
+			static_assert(N == sizeof...(Ind), "Wrong number of indices.");
 		}
 		
 		inline size_t flat_index()
@@ -56,23 +53,27 @@ class arraynd
 		template<typename... Ind>
 		inline T& operator()       (Ind... ind) noexcept
 		{
+			check_ind(ind...);
 			return flat[flat_index(ind...)];
 		}
 		template<typename... Ind>
 		inline const T& operator() (Ind... ind) const noexcept
 		{
+			check_ind(ind...);
 			return flat[flat_index(ind...)];
 		}
 		template<typename... Ind>
 		inline T& at               (Ind... ind)
 		{
 			check_ind(ind...);
+			check_range(ind...);
 			return flat.at(flat_index(ind...));
 		}
 		template<typename... Ind>
 		inline const T& at         (Ind... ind) const
 		{
 			check_ind(ind...);
+			check_range(ind...);
 			return flat.at(flat_index(ind...));
 		}
 		
