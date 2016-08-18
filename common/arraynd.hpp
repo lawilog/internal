@@ -5,7 +5,6 @@
 #include <array>
 #include <functional>
 #include <numeric>
-#include "printf++.hpp"
 
 namespace LW {
 
@@ -16,15 +15,25 @@ class arraynd
 		std::vector<T> flat;
 		std::array<size_t,N> n;
 		
-		inline void check_ind() const {}
+		inline void check_range() const {}
 		
 		template<typename... Ind>
-		inline void check_ind(size_t i, Ind... ind) const
+		inline void check_range(size_t i, Ind... ind) const
 		{
 			static const unsigned k = N - 1 - sizeof...(Ind);
 			if(i >= n[k])
-				throw std::out_of_range(strprintf("arraynd<%u>: index %u (which is %u) is out of range (%u)", N, k, i, n[k]));
-			check_ind(ind...);
+				throw std::out_of_range("arraynd<"+ std::to_string(N) + ">: index "+ std::to_string(k) + " (which is "+ std::to_string(i) + ") is out of range ("+ std::to_string(n[k]) + ")");
+			
+			check_range(ind...);
+		}
+		
+		template<typename... Ind>
+		inline void check_ind(Ind... ind) const
+		{
+			if(N != sizeof...(Ind))
+				throw std::invalid_argument("arraynd<"+ std::to_string(N) + ">: needs exactly "+ std::to_string(N) + " indices, got "+ std::to_string(sizeof...(Ind)));
+			
+			check_range(ind...);
 		}
 		
 		inline size_t flat_index()

@@ -48,7 +48,8 @@ int main()
 	
 	try
 	{
-		cout<< rand_choose({}) <<endl;
+		vector<int> v;
+		cout<< rand_choose(v) <<endl;
 	}
 	catch(const out_of_range& e)
 	{

@@ -44,6 +44,19 @@ int main()
 	}
 	catch(...) {throw;}
 	
+	cout<<"This should also throw:"<<endl;
+	A.resize({5, 3, 2});
+	try
+	{
+		cout<< A.at() <<endl;
+		cout<<"If this line is printed, something went wrong."<<endl;
+	}
+	catch(const invalid_argument& e)
+	{
+		cout<<"As expected, an error occured: "<< e.what() <<endl;
+	}
+	catch(...) {throw;}
+	
 	cout<<"Over and out."<<endl;
 	
 	return 0;

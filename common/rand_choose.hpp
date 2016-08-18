@@ -12,9 +12,12 @@ namespace LW {
 //        if sum is omitted, it is assumed that sum(p) == 1
 //        if sum is non-positive (e.g. 0 or -1), sum is calculated from vector
 // output: index i is returned with probability p[i]/sum(p), 0 <= i < p.size()
-unsigned rand_choose(const std::vector<double>& p, double sum=1.0)
+template <class T> // thinking of T as std::vector<double> or std::array<double>
+unsigned rand_choose(const T& p, double sum=1.0)
 {
-	if(p.empty()) throw std::out_of_range("rand_choose: cannot choose from empty vector");
+	if(p.empty())
+		throw std::out_of_range("rand_choose: cannot choose from empty vector");
+	
 	if(sum <= 0)
 	{
 		sum = 0;
