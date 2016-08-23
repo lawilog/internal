@@ -30,5 +30,9 @@ int main()
 	L.unique();
 	cout<< sum(L.begin(), L.end()) <<endl;
 	
+	vector<double> B(7, 0.1);
+	cout<< accumulate(B.begin(), B.end(), 0) << endl; // warning: this is 0.
+	cout<< accumulate(B.begin(), B.end(), 0.0) << endl; // this is okay.
+	
 	return 0;
 }
