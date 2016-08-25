@@ -12,25 +12,20 @@ namespace LW {
 template<int N, class T>
 struct power_
 {
-	static inline T of(const T x)
+	static inline T of(const T& x)
 	{
-		static const T temp = power_<N/2, T>::of(x);
-		if( N % 2 == 0)
-			return temp * temp;
-		else
-		{
-			if(N > 0)
-				return x * temp * temp;
-			else
-				return (temp * temp) / x;
-		}
+		static const T y = power_<N/2, T>::of(x);
+		static const T y2 = y * y;
+		static constexpr bool even = (N % 2 == 0);
+		static constexpr bool positive = (N > 0);
+		return even ? y2 : (positive ? x * y2 : y2 / x);
 	}
 };
 
 template<class T>
 struct power_<0, T>
 {
-	static inline T of(const T x)
+	static inline T of(const T& x)
 	{
 		return 1;
 	}
