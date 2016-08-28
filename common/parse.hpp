@@ -57,7 +57,7 @@ template<class T> std::vector<T> parse(const std::vector<char*>& vstr)
 {
 	std::vector<T> v;
 	v.reserve(vstr.size());
-	for(const char*& str: vstr)
+	for(char* const& str: vstr)
 		v.push_back(parse<T>(str));
 	return v;
 }
