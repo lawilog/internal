@@ -1,5 +1,5 @@
-#ifndef _LW_ARRAY2D_HPP
-#define _LW_ARRAY2D_HPP
+#ifndef _LW_VECTOR2D_HPP
+#define _LW_VECTOR2D_HPP
 
 #include <vector>
 #include <array>
@@ -9,29 +9,29 @@
 namespace LW {
 
 template<class T>
-class array2d
+class vector2d
 {
 	private:
 		std::vector<T> flat;
 		std::array<size_t,2> n;
 	
 	public:
-		array2d() {n = {0, 0};};
-		array2d(std::array<size_t,2> _n) : flat(_n[0]*_n[1]), n(_n) {};
-		array2d(size_t nx, size_t ny) : flat(nx*ny), n({nx, ny}) {};
+		vector2d() {n = {0, 0};};
+		vector2d(std::array<size_t,2> _n) : flat(_n[0]*_n[1]), n(_n) {};
+		vector2d(size_t nx, size_t ny) : flat(nx*ny), n({nx, ny}) {};
 		
 		inline T& operator()       (size_t i, size_t j) noexcept       {return flat[n[1]*i+j];}
 		inline const T& operator() (size_t i, size_t j) const noexcept {return flat[n[1]*i+j];}
 		inline T& at               (size_t i, size_t j)
 		{
-			if(i >= n[0]) throw std::out_of_range(strprintf("array2d: first index (which is %u) out of range (%u)", i, n[0]));
-			if(j >= n[1]) throw std::out_of_range(strprintf("array2d: second index (which is %u) out of range (%u)", j, n[1]));
+			if(i >= n[0]) throw std::out_of_range(strprintf("vector2d: first index (which is %u) out of range (%u)", i, n[0]));
+			if(j >= n[1]) throw std::out_of_range(strprintf("vector2d: second index (which is %u) out of range (%u)", j, n[1]));
 			return flat.at(n[1]*i+j);
 		}
 		inline const T& at         (size_t i, size_t j) const
 		{
-			if(i >= n[0]) throw std::out_of_range(strprintf("array2d: first index (which is %u) out of range (%u)", i, n[0]));
-			if(j >= n[1]) throw std::out_of_range(strprintf("array2d: second index (which is %u) out of range (%u)", j, n[1]));
+			if(i >= n[0]) throw std::out_of_range(strprintf("vector2d: first index (which is %u) out of range (%u)", i, n[0]));
+			if(j >= n[1]) throw std::out_of_range(strprintf("vector2d: second index (which is %u) out of range (%u)", j, n[1]));
 			return flat.at(n[1]*i+j);
 		}
 		
@@ -47,4 +47,4 @@ class array2d
 
 }
 
-#endif // _LW_ARRAY2D_HPP
+#endif // _LW_VECTOR2D_HPP

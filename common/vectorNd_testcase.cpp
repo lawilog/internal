@@ -1,17 +1,17 @@
 #include <iostream>
-#include "arraynd.hpp"
+#include "vectorNd.hpp"
 using namespace std;
 using namespace LW;
 
 int main()
 {
-	arraynd<int,2> a({3,4});
+	vectorNd<int,2> a({3,4});
 	cout<<"a length = "<< (a.flat_end() - a.flat_begin()) << endl;
 	for(unsigned i = 0; i < 3; ++i)
 		for(unsigned j = 0; j < 4; ++j)
 			a(i,j) = 10*i + j;
 	
-	arraynd<int,2> b = a;
+	vectorNd<int,2> b = a;
 	
 	a.resize({1, 15});
 	for(unsigned k = 0; k < 15; ++k)
@@ -19,7 +19,7 @@ int main()
 	
 	
 	
-	arraynd<int,3> A({2, 3, 5});
+	vectorNd<int,3> A({2, 3, 5});
 	array<size_t,3> N = A.size();
 	for(unsigned i = 0; i < N[0]; ++i)
 		for(unsigned j = 0; j < N[1]; ++j)
@@ -44,7 +44,7 @@ int main()
 	}
 	catch(...) {throw;}
 	
-	// does not compile du to wrong number of indices:
+	// does not compile due to wrong number of indices:
 	// A(), A(3), A(9,8,7,6,5,4)
 	
 	cout<<"Over and out."<<endl;

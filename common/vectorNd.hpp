@@ -1,5 +1,5 @@
-#ifndef _LW_ARRAYND_HPP
-#define _LW_ARRAYND_HPP
+#ifndef _LW_VECTORND_HPP
+#define _LW_VECTORND_HPP
 
 #include <vector>
 #include <array>
@@ -9,7 +9,7 @@
 namespace LW {
 
 template<class T, unsigned N>
-class arraynd
+class vectorNd
 {
 	private:
 		std::vector<T> flat;
@@ -22,7 +22,7 @@ class arraynd
 		{
 			static const unsigned k = N - 1 - sizeof...(Ind);
 			if(i >= n[k])
-				throw std::out_of_range("arraynd<"+ std::to_string(N) + ">: index "+ std::to_string(k) + " (which is "+ std::to_string(i) + ") is out of range ("+ std::to_string(n[k]) + ")");
+				throw std::out_of_range("vectorNd<"+ std::to_string(N) + ">: index "+ std::to_string(k) + " (which is "+ std::to_string(i) + ") is out of range ("+ std::to_string(n[k]) + ")");
 			
 			check_range(ind...);
 		}
@@ -45,8 +45,8 @@ class arraynd
 		}
 	
 	public:
-		arraynd() { std::fill(n.begin(), n.end(), 0); }
-		arraynd(std::array<size_t,N> _n) :
+		vectorNd() { std::fill(n.begin(), n.end(), 0); }
+		vectorNd(std::array<size_t,N> _n) :
 			flat( std::accumulate(_n.begin(), _n.end(), 1, std::multiplies<size_t>()) ),
 			n(_n) {}
 		
@@ -92,4 +92,4 @@ class arraynd
 
 }
 
-#endif // _LW_ARRAYND_HPP
+#endif // _LW_VECTORND_HPP

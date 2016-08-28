@@ -1,11 +1,11 @@
 #include <iostream>
-#include "array3d.hpp"
+#include "vector3d.hpp"
 using namespace std;
 using namespace LW;
 
 int main(int argc, char** argv)
 {
-	array3d<int> a(2, 3, 5);
+	vector3d<int> a(2, 3, 5);
 	array<size_t,3> N = a.size();
 	for(unsigned i = 0; i < N[0]; ++i)
 		for(unsigned j = 0; j < N[1]; ++j)

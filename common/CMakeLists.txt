@@ -49,24 +49,24 @@ add_executable(align_as_table
 	LineArray.cpp
 )
 
-add_executable(array2d_testcase
-    array2d_testcase.cpp
+add_executable(vector2d_testcase
+    vector2d_testcase.cpp
 )
 
-add_executable(array3d_testcase
-    array3d_testcase.cpp
+add_executable(vector3d_testcase
+    vector3d_testcase.cpp
 )
 
-add_executable(array3d_benchmark
-    array3d_benchmark.cpp
+add_executable(vector3d_benchmark
+    vector3d_benchmark.cpp
 )
 
-add_executable(arraynd_benchmark
-    arraynd_benchmark.cpp
+add_executable(vectorNd_benchmark
+    vectorNd_benchmark.cpp
 )
 
-add_executable(arraynd_testcase
-    arraynd_testcase.cpp
+add_executable(vectorNd_testcase
+    vectorNd_testcase.cpp
 )
 
 add_executable(rand_choose_testcase

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "array3d.hpp"
+#include "vector3d.hpp"
 using namespace std;
 using namespace LW;
 
@@ -26,11 +26,11 @@ int main(int argc, char** argv)
 	const int ck = atoi(argv[7]);
 	const unsigned px = 29, py = 23, pz = 19;
 	const unsigned Nx = mypow(px, mx), Ny = mypow(py, my), Nz = mypow(pz, mz);
-	cout<<"array dimensions: "<< Nx <<" "<< Ny <<" "<< Nz <<endl;
+	cout<<"vector dimensions: "<< Nx <<" "<< Ny <<" "<< Nz <<endl;
 	if(mode == 1)
 	{
-		cout<<"mode array3d<int>"<<endl;
-		array3d<int> a(Nx, Ny, Nz);
+		cout<<"mode vector3d<int>"<<endl;
+		vector3d<int> a(Nx, Ny, Nz);
 		for(unsigned i = 0, x = 0; i < Nx; ++i, x=(x+15)%Nx)
 			for(unsigned j = 0, y = 0; j < Ny; ++j, y=(y+15)%Ny)
 				for(unsigned k = 0, z = 0; k < Nz; ++k, z=(z+15)%Nz)

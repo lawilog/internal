@@ -15,12 +15,12 @@ bytes2str_testcase
 EigenOctave_testcase
 lsqnonneg_test
 lscov_testcase
-array2d_testcase
-array3d_benchmark
-array3d_testcase
+vector2d_testcase
+vector3d_benchmark
+vector3d_testcase
 rand_choose_testcase
 sum_testcase
-arraynd_testcase
-arraynd_benchmark
+vectorNd_testcase
+vectorNd_benchmark
 
 function_interpolation_table_*.dat
