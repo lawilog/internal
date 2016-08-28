@@ -17,7 +17,11 @@ int main()
 	for(unsigned k = 0; k < 15; ++k)
 		cout<< a.at(0, k) <<endl;
 	
-	
+	vectorNd<double,3> v({3,3,3});
+	fill(v.flat_begin(), v.flat_end(), 0);
+	cout<<"v capacity: "<< v.flat_cref().capacity() <<endl;
+	v.flat_data()[0] = 42;
+	cout<<"v front: "<< v.flat_cref().front() <<endl;
 	
 	vectorNd<int,3> A({2, 3, 5});
 	array<size_t,3> N = A.size();
