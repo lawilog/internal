@@ -1,5 +1,5 @@
 #!/usr/bin/awk -f
-{
+!/^#/{
 	if(NF>NFmax)
 	{
 		for(i=NFmax+1; i<=NF; ++i)
