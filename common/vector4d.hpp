@@ -27,7 +27,7 @@ class vector4d
 	
 	public:
 		vector4d() : vector4d(0, 0, 0, 0) {};
-		vector4d(std::vector<size_t,4> n) : vector4d(n[0], n[1], n[2], n[3]) {};
+		vector4d(std::array<size_t,4> n) : vector4d(n[0], n[1], n[2], n[3]) {};
 		vector4d(size_t n0, size_t n1, size_t n2, size_t n3) : flat(n0*n1*n2*n3), n({n0, n1, n2, n3}), n32(n3*n2), n321(n3*n2*n1) {};
 		
 		inline T& operator()       (size_t i, size_t j, size_t k, size_t l) noexcept       {return flat[flatind(i, j, k, l)];}
