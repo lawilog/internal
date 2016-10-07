@@ -23,10 +23,12 @@ int main()
 	cout<< v << endl;
 	
 	// testing with same seed twice, should output same pseudorandom numbers twice
-	RandDistrib_Seed<int, uniform_int_distribution> randiA(1337, 1, 10);
+	RandDistrib<int, uniform_int_distribution> randiA(1, 10);
+	randiA.reseed(1337);
 	cout<< randiA(5) <<endl;
 	
-	RandDistrib_Seed<int, uniform_int_distribution> randiB(1337, 1, 10);
+	RandDistrib<int, uniform_int_distribution> randiB(1, 10);
+	randiB.reseed(1337);
 	cout<< randiB(5) <<endl;
 	
 	return 0;
