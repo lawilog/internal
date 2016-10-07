@@ -32,7 +32,7 @@ inline T sum(const std::array<T,N>& v)
 }
 
 template<typename T, std::size_t N>
-size_t sum(const T (&v)[N])
+inline size_t sum(const T (&v)[N])
 {
     return std::accumulate(v, v+N, T());
 }
