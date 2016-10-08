@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "RandDistrib.hpp"
+#include "sum.hpp"
 
 namespace LW {
 
@@ -19,11 +20,7 @@ unsigned rand_choose(const T& p, double sum=1.0)
 		throw std::out_of_range("rand_choose: cannot choose from empty vector");
 	
 	if(sum <= 0)
-	{
-		sum = 0;
-		for(auto& x: p)
-			sum += x;
-	}
+		sum = LW::sum(p);
 	
 	static RandDistrib<double,std::uniform_real_distribution> rand(0, 1);
 	const double r = sum * rand();
@@ -32,6 +29,31 @@ unsigned rand_choose(const T& p, double sum=1.0)
 	while(choice < p.size()-1 && r > cumsum) cumsum += p[++choice];
 	return choice;
 }
+
+class RandChooseSeeded
+{
+	private:
+		RandDistrib<double,std::uniform_real_distribution> rand;
+	
+	public:
+		RandChooseSeeded(unsigned seed) : rand(0, 1) {rand.reseed(seed);}
+		
+		template<class T>
+		unsigned operator() (const T& p, double sum=1.0)
+		{
+			if(p.empty())
+				throw std::out_of_range("rand_choose: cannot choose from empty vector");
+			
+			if(sum <= 0)
+				sum = LW::sum(p);
+			
+			const double r = sum * rand();
+			double cumsum = p[0]; // valid, since p is not empty
+			unsigned choice = 0;
+			while(choice < p.size()-1 && r > cumsum) cumsum += p[++choice];
+			return choice;
+		}
+};
 
 /* equivalent Matlab code:
 function c = rand_choose(this, p) % given vector p with sum(p)==1, return i with probability p(i)

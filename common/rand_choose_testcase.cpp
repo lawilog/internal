@@ -46,6 +46,11 @@ int main()
 		cout<< q <<"\n"<< n <<"\n"<<endl;
 	}
 	
+	cout<<"different from run to tun: "<< rand_choose(vector<double>({1, 2, 3, 4, 5, 6}), -1) << endl;
+	
+	RandChooseSeeded rand_choose_seeded(1337);
+	cout<<"the same every run: "<< rand_choose_seeded(vector<double>({1, 2, 3}), -1) <<endl;
+	
 	try
 	{
 		vector<int> v;

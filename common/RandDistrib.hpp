@@ -20,6 +20,9 @@ class RandDistrib
 		template<typename... Params>
 		RandDistrib(Params... parameters) : rand_dev(), generator(rand_dev()), F(parameters...) {}
 		
+		// per default we seed from random dev. use reseed() only if you want a particular seed:
+		void reseed(unsigned new_seed) {generator.seed(new_seed);}
+		
 		number_type operator() ()
 		{
 			return F(generator);

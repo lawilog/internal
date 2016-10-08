@@ -22,6 +22,15 @@ int main()
 	valarray<double> v = 2.0 * randv(10) - 1.0;
 	cout<< v << endl;
 	
+	// testing with same seed twice, should output same pseudorandom numbers twice
+	RandDistrib<int, uniform_int_distribution> randiA(1, 10);
+	randiA.reseed(1337);
+	cout<< randiA(5) <<endl;
+	
+	RandDistrib<int, uniform_int_distribution> randiB(1, 10);
+	randiB.reseed(1337);
+	cout<< randiB(5) <<endl;
+	
 	return 0;
 }
-	
+
