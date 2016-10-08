@@ -33,13 +33,13 @@ class vectorNd
 			static_assert(N == sizeof...(Ind), "Wrong number of indices.");
 		}
 		
-		inline size_t flat_index() const
+		inline size_t flat_index() const noexcept
 		{
 			return 0;
 		}
 		
 		template<typename... Ind>
-		inline size_t flat_index(size_t i, Ind... ind) const
+		inline size_t flat_index(size_t i, Ind... ind) const noexcept
 		{
 			return i * accumulate(&n[N - sizeof...(Ind)], n.end(), 1, std::multiplies<size_t>()) + flat_index(ind...);
 		}
@@ -77,7 +77,7 @@ class vectorNd
 			return flat.at(flat_index(ind...));
 		}
 		
-		inline const std::array<size_t,N>& size() const {return n;}
+		inline const std::array<size_t,N>& size() const noexcept {return n;}
 		
 		void resize(const std::array<size_t,N>& _n)
 		{
