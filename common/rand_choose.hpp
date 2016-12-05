@@ -30,6 +30,24 @@ unsigned rand_choose(const T& p, double sum=1.0)
 	return choice;
 }
 
+template <class T>
+unsigned rand_choose_1337(const T& p, double sum=1.0)
+{
+	if(p.empty())
+		throw std::out_of_range("rand_choose: cannot choose from empty vector");
+	
+	if(sum <= 0)
+		sum = LW::sum(p);
+	
+	static std::default_random_engine generator(1337);
+	static std::uniform_real_distribution<double> rand(0, 1);
+	const double r = sum * rand(generator);
+	double cumsum = p[0]; // valid, since p is not empty
+	unsigned choice = 0;
+	while(choice < p.size()-1 && r > cumsum) cumsum += p[++choice];
+	return choice;
+}
+
 class RandChooseSeeded
 {
 	private:
