@@ -54,7 +54,9 @@ class vector4d
 		
 		inline typename std::vector<T>::iterator flat_begin() {return flat.begin();}
 		inline typename std::vector<T>::iterator flat_end() {return flat.end();}
-		inline const std::vector<T>& flat_ref() const {return flat;}
+		inline const std::vector<T>& flat_cref() const noexcept {return flat;}
+		inline typename std::vector<T>::pointer flat_data() noexcept {return flat.data();}
+		inline typename std::vector<T>::const_pointer flat_data() const noexcept {return flat.data();}
 };
 
 }

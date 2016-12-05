@@ -89,8 +89,8 @@ class vectorNd
 		inline typename std::vector<T>::iterator flat_begin() noexcept {return flat.begin();}
 		inline typename std::vector<T>::iterator flat_end() noexcept {return flat.end();}
 		inline const std::vector<T>& flat_cref() const noexcept {return flat;}
-		inline T* flat_data() noexcept {return flat.data();}
-		inline const T* flat_data() const noexcept {return flat.data();}
+		inline typename std::vector<T>::pointer flat_data() noexcept {return flat.data();}
+		inline typename std::vector<T>::const_pointer flat_data() const noexcept {return flat.data();}
 };
 
 }
