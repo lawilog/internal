@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <array>
-#include "printf++.hpp"
 
 namespace LW {
 
@@ -14,26 +13,28 @@ class vector3d
 		std::vector<T> flat;
 		std::array<size_t,3> n;
 		size_t nn;
+		inline void check_range(size_t i, size_t j, size_t k) const
+		{
+			if(i >= n[0]) throw std::out_of_range("vector3d: first index (which is " + std::to_string(i) + ") out of range ("+ std::to_string(n[0]) + ")");
+			if(j >= n[1]) throw std::out_of_range("vector3d: second index (which is "+ std::to_string(j) + ") out of range ("+ std::to_string(n[1]) + ")");
+			if(k >= n[2]) throw std::out_of_range("vector3d: third index (which is "+ std::to_string(k) + ") out of range ("+ std::to_string(n[2]) + ")");
+		}
 	
 	public:
 		vector3d() {n = {0, 0, 0}; nn = 0;};
 		vector3d(std::array<size_t,3> _n) : flat(_n[0]*_n[1]*_n[2]), n(_n) {nn = _n[1]*_n[2];};
 		vector3d(size_t nx, size_t ny, size_t nz) : flat(nx*ny*nz), n({nx, ny, nz}) {nn = ny*nz;};
 		
-		inline T& operator()       (size_t i, size_t j, size_t k) noexcept       {return flat[nn*i+n[2]*j+k];}
-		inline const T& operator() (size_t i, size_t j, size_t k) const noexcept {return flat[nn*i+n[2]*j+k];}
-		inline T& at               (size_t i, size_t j, size_t k)
+		inline typename std::vector<T>::reference operator()       (size_t i, size_t j, size_t k) noexcept       {return flat[nn*i+n[2]*j+k];}
+		inline typename std::vector<T>::const_reference operator() (size_t i, size_t j, size_t k) const noexcept {return flat[nn*i+n[2]*j+k];}
+		inline typename std::vector<T>::reference at               (size_t i, size_t j, size_t k)
 		{
-			if(i >= n[0]) throw std::out_of_range(strprintf("vector3d: first index (which is %u) out of range (%u)", i, n[0]));
-			if(j >= n[1]) throw std::out_of_range(strprintf("vector3d: second index (which is %u) out of range (%u)", j, n[1]));
-			if(k >= n[2]) throw std::out_of_range(strprintf("vector3d: third index (which is %u) out of range (%u)", k, n[2]));
+			check_range(i, j, k);
 			return flat.at(nn*i+n[2]*j+k);
 		}
-		inline const T& at         (size_t i, size_t j, size_t k) const
+		inline typename std::vector<T>::const_reference at         (size_t i, size_t j, size_t k) const
 		{
-			if(i >= n[0]) throw std::out_of_range(strprintf("vector3d: first index (which is %u) out of range (%u)", i, n[0]));
-			if(j >= n[1]) throw std::out_of_range(strprintf("vector3d: second index (which is %u) out of range (%u)", j, n[1]));
-			if(k >= n[2]) throw std::out_of_range(strprintf("vector3d: third index (which is %u) out of range (%u)", k, n[2]));
+			check_range(i, j, k);
 			return flat.at(nn*i+n[2]*j+k);
 		}
 		

@@ -20,6 +20,7 @@ class vectorNd
 		template<typename... Ind>
 		inline void check_range(size_t i, Ind... ind) const
 		{
+			// asserts we never get too many "ind"s (ok, because this is a private function, only called after check_ind)
 			static const unsigned k = N - 1 - sizeof...(Ind);
 			if(i >= n[k])
 				throw std::out_of_range("vectorNd<"+ std::to_string(N) + ">: index "+ std::to_string(k) + " (which is "+ std::to_string(i) + ") is out of range ("+ std::to_string(n[k]) + ")");
@@ -51,26 +52,26 @@ class vectorNd
 			n(_n) {}
 		
 		template<typename... Ind>
-		inline T& operator()       (Ind... ind) noexcept
+		inline typename std::vector<T>::reference operator()       (Ind... ind) noexcept
 		{
 			check_ind(ind...);
 			return flat[flat_index(ind...)];
 		}
 		template<typename... Ind>
-		inline const T& operator() (Ind... ind) const noexcept
+		inline typename std::vector<T>::const_reference operator() (Ind... ind) const noexcept
 		{
 			check_ind(ind...);
 			return flat[flat_index(ind...)];
 		}
 		template<typename... Ind>
-		inline T& at               (Ind... ind)
+		inline typename std::vector<T>::reference at               (Ind... ind)
 		{
 			check_ind(ind...);
 			check_range(ind...);
 			return flat.at(flat_index(ind...));
 		}
 		template<typename... Ind>
-		inline const T& at         (Ind... ind) const
+		inline typename std::vector<T>::const_reference at         (Ind... ind) const
 		{
 			check_ind(ind...);
 			check_range(ind...);

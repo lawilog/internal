@@ -16,5 +16,9 @@ int main()
 	for(unsigned k = 0; k < 15; ++k)
 		cout<< a.at(0, k) <<endl;
 	
+	vector2d<bool> B(32, 8); // invokes specialized template
+	B.resize(256, 1);
+	B(23, 0) = true;
+	
 	return 0;
 }

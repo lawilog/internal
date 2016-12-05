@@ -4,7 +4,6 @@
 #include <vector>
 #include <array>
 #include <stdexcept>
-#include "printf++.hpp"
 
 namespace LW {
 
@@ -14,24 +13,27 @@ class vector2d
 	private:
 		std::vector<T> flat;
 		std::array<size_t,2> n;
+		inline void check_range(size_t i, size_t j) const
+		{
+			if(i >= n[0]) throw std::out_of_range("vector2d: first index (which is "+ std::to_string(i) + ") out of range ("+ std::to_string(n[0]) + ")");
+			if(j >= n[1]) throw std::out_of_range("vector2d: second index (which is "+ std::to_string(j) + ") out of range ("+ std::to_string(n[1]) + ")");
+		}
 	
 	public:
 		vector2d() {n = {0, 0};};
 		vector2d(std::array<size_t,2> _n) : flat(_n[0]*_n[1]), n(_n) {};
 		vector2d(size_t nx, size_t ny) : flat(nx*ny), n({nx, ny}) {};
 		
-		inline T& operator()       (size_t i, size_t j) noexcept       {return flat[n[1]*i+j];}
-		inline const T& operator() (size_t i, size_t j) const noexcept {return flat[n[1]*i+j];}
-		inline T& at               (size_t i, size_t j)
+		inline typename std::vector<T>::reference operator()       (size_t i, size_t j) noexcept       {return flat[n[1]*i+j];}
+		inline typename std::vector<T>::const_reference operator() (size_t i, size_t j) const noexcept {return flat[n[1]*i+j];}
+		inline typename std::vector<T>::reference at               (size_t i, size_t j)
 		{
-			if(i >= n[0]) throw std::out_of_range(strprintf("vector2d: first index (which is %u) out of range (%u)", i, n[0]));
-			if(j >= n[1]) throw std::out_of_range(strprintf("vector2d: second index (which is %u) out of range (%u)", j, n[1]));
+			check_range(i, j);
 			return flat.at(n[1]*i+j);
 		}
-		inline const T& at         (size_t i, size_t j) const
+		inline typename std::vector<T>::const_reference at         (size_t i, size_t j) const
 		{
-			if(i >= n[0]) throw std::out_of_range(strprintf("vector2d: first index (which is %u) out of range (%u)", i, n[0]));
-			if(j >= n[1]) throw std::out_of_range(strprintf("vector2d: second index (which is %u) out of range (%u)", j, n[1]));
+			check_range(i, j);
 			return flat.at(n[1]*i+j);
 		}
 		
