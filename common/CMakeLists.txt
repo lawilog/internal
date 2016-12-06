@@ -69,6 +69,10 @@ add_executable(vectorNd_testcase
     vectorNd_testcase.cpp
 )
 
+add_executable(nvectorNd_testcase
+    nvectorNd_testcase.cpp
+)
+
 add_executable(rand_choose_testcase
     rand_choose_testcase.cpp
 )
