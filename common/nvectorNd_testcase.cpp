@@ -14,6 +14,9 @@ int main()
 	++y[0][0];
 	cout<<"Should be one: "<< v[0][0][0] <<endl;
 	
+	const nvectorNd<double,3> a(4, 4, 4);
+	cout<<"Should be zero: "<< a(3, 2, 1) <<endl;
+	
 	cout<<"This should crash:"<<endl;
 	v[2].at(999)[1] = 2.3;
 	return 0;

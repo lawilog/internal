@@ -15,9 +15,25 @@ template<class T> struct nvectorNd_helper<T,1>
 	{
 		w.resize(*dim);
 	}
-	static inline typename std::vector<T>::reference element(type& w, const size_t* dim)
+	template<typename... Ind>
+	inline static typename std::vector<T>::reference elem(type& w, size_t i) noexcept
 	{
-		return w[*dim];
+		return w[i];
+	}
+	template<typename... Ind>
+	inline static typename std::vector<T>::const_reference elem(const type& w, size_t i) noexcept
+	{
+		return w[i];
+	}
+	template<typename... Ind>
+	inline static typename std::vector<T>::reference at(type& w, size_t i)
+	{
+		return w.at(i);
+	}
+	template<typename... Ind>
+	inline static typename std::vector<T>::const_reference at(const type& w, size_t i)
+	{
+		return w.at(i);
 	}
 };
 template<class T, unsigned N>
@@ -30,52 +46,90 @@ struct nvectorNd_helper
 		for(unsigned i = 0; i < *dim; ++i)
 			nvectorNd_helper<T,N-1>::init(w[i], dim+1);
 	}
-	static inline typename std::vector<T>::reference element(type& w, const size_t* dim)
+	template<typename... Ind>
+	inline static typename std::vector<T>::reference elem(type& w, size_t i, Ind... ind) noexcept
 	{
-		return nvectorNd_helper<T,N-1>::element(w[*dim], dim+1);
+		return nvectorNd_helper<T,N-1>::elem(w[i], ind...);
+	}
+	template<typename... Ind>
+	inline static typename std::vector<T>::const_reference elem(const type& w, size_t i, Ind... ind) noexcept
+	{
+		return nvectorNd_helper<T,N-1>::elem(w[i], ind...);
+	}
+	template<typename... Ind>
+	inline static typename std::vector<T>::reference at(type& w, size_t i, Ind... ind)
+	{
+		return nvectorNd_helper<T,N-1>::at(w.at(i), ind...);
+	}
+	template<typename... Ind>
+	inline static typename std::vector<T>::const_reference at(const type& w, size_t i, Ind... ind)
+	{
+		return nvectorNd_helper<T,N-1>::at(w.at(i), ind...);
 	}
 };
 
 template<class T, unsigned N>
-struct nvectorNd
+class nvectorNd
 {
 	using nested_vector = typename nvectorNd_helper<T,N>::type;
-	nested_vector value;
+	using T_reference = typename std::vector<T>::reference;
+	using T_const_reference = typename std::vector<T>::const_reference;
 	
-	nvectorNd() {}
-	//nvectorNd(const std::array<size_t,N>& n) { nvectorNd_helper<T,N>::init(&n[0], value);}
-	nvectorNd(size_t i...)
-	{
-		std::array<size_t,N> n;
-		n[0] = i;
-		va_list L;
-		va_start(L, i);
-		for(unsigned i = 1; i < N; ++i)
-			n[i] = va_arg(L, size_t);
+	private:
+		template<typename... Ind>
+		inline void check_ind(Ind... ind) const
+		{
+			static_assert(N == sizeof...(Ind), "Wrong number of indices.");
+		}
 		
-		va_end(L);
+	public:
+		nested_vector value;
 		
-		nvectorNd_helper<T,N>::init(value, &n[0]);
-	}
-	
-	inline typename std::vector<T>::reference operator()(size_t i...) noexcept
-	{
-		std::array<size_t,N> n;
-		n[0] = i;
-		va_list L;
-		va_start(L, i);
-		for(unsigned i = 1; i < N; ++i)
-			n[i] = va_arg(L, size_t);
+		nvectorNd() {}
+		//nvectorNd(const std::array<size_t,N>& n) { nvectorNd_helper<T,N>::init(&n[0], value);}
+		nvectorNd(size_t i...)
+		{
+			std::array<size_t,N> n;
+			n[0] = i;
+			va_list L;
+			va_start(L, i);
+			for(unsigned i = 1; i < N; ++i)
+				n[i] = va_arg(L, size_t);
+			
+			va_end(L);
+			
+			nvectorNd_helper<T,N>::init(value, &n[0]);
+		}
 		
-		va_end(L);
+		template<typename... Ind>
+		inline T_reference operator()       (Ind... ind) noexcept
+		{
+			check_ind(ind...);
+			return nvectorNd_helper<T,N>::elem(value, ind...);
+		}
+		template<typename... Ind>
+		inline T_const_reference operator() (Ind... ind) const noexcept
+		{
+			check_ind(ind...);
+			return nvectorNd_helper<T,N>::elem(value, ind...);
+		}
+		template<typename... Ind>
+		inline T_reference at               (Ind... ind)
+		{
+			check_ind(ind...);
+			return nvectorNd_helper<T,N>::at(value, ind...);
+		}
+		template<typename... Ind>
+		inline T_const_reference at         (Ind... ind) const
+		{
+			check_ind(ind...);
+			return nvectorNd_helper<T,N>::at(value, ind...);
+		}
 		
-		return nvectorNd_helper<T,N>::element(value, &n[0]);
-	}
-	
-	inline typename nested_vector::reference       operator[](size_t i) noexcept { return value[i]; }
-	inline typename nested_vector::const_reference operator[](size_t i) const noexcept { return value[i]; }
-	inline typename nested_vector::reference       at(size_t i) { return value.at(i); }
-	inline typename nested_vector::const_reference at(size_t i) const { return value.at(i); }
+		inline typename nested_vector::reference       operator[](size_t i) noexcept { return value[i]; }
+		inline typename nested_vector::const_reference operator[](size_t i) const noexcept { return value[i]; }
+		inline typename nested_vector::reference       at(size_t i) { return value.at(i); }
+		inline typename nested_vector::const_reference at(size_t i) const { return value.at(i); }
 };
 
 }
