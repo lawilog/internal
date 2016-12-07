@@ -4,6 +4,12 @@
 #include <vector>
 #include <array>
 #include <cstdarg>
+/* nvectorNd<T,N> creates nested N-dimensional std::vector of type T
+ * e.g. nvectorNd<int,3> v; is effectively vector<vector<vector<int>>> v;
+ * provides both v[1][2][3] and v(1,2,3) interface
+ * also v.at(1,2,3) and v.at(1)[2].at(3), for boundary checks etc.
+ * also allows direct access via v.value
+ */
 
 namespace LW {
 
@@ -11,9 +17,10 @@ template<class T, unsigned N> struct nvectorNd_helper;
 template<class T> struct nvectorNd_helper<T,1>
 {
 	typedef std::vector<T> type;
-	static void init(type& w, const size_t* dim)
+	
+	inline static void init(type& w, const size_t ni)
 	{
-		w.resize(*dim);
+		w.resize(ni);
 	}
 	template<typename... Ind>
 	inline static typename std::vector<T>::reference elem(type& w, size_t i) noexcept
@@ -40,11 +47,13 @@ template<class T, unsigned N>
 struct nvectorNd_helper
 {
 	typedef std::vector<typename nvectorNd_helper<T,N-1>::type> type;
-	static void init(type& w, const size_t* dim)
+	
+	template<typename... Ind>
+	inline static void init(type& w, const size_t ni, Ind... ind)
 	{
-		w.resize(*dim);
-		for(unsigned i = 0; i < *dim; ++i)
-			nvectorNd_helper<T,N-1>::init(w[i], dim+1);
+		w.resize(ni);
+		for(unsigned i = 0; i < ni; ++i)
+			nvectorNd_helper<T,N-1>::init(w[i], ind...);
 	}
 	template<typename... Ind>
 	inline static typename std::vector<T>::reference elem(type& w, size_t i, Ind... ind) noexcept
@@ -72,8 +81,6 @@ template<class T, unsigned N>
 class nvectorNd
 {
 	using nested_vector = typename nvectorNd_helper<T,N>::type;
-	using T_reference = typename std::vector<T>::reference;
-	using T_const_reference = typename std::vector<T>::const_reference;
 	
 	private:
 		template<typename... Ind>
@@ -86,41 +93,34 @@ class nvectorNd
 		nested_vector value;
 		
 		nvectorNd() {}
-		//nvectorNd(const std::array<size_t,N>& n) { nvectorNd_helper<T,N>::init(&n[0], value);}
-		nvectorNd(size_t i...)
+		
+		template<typename... Ind>
+		nvectorNd(Ind... ind)
 		{
-			std::array<size_t,N> n;
-			n[0] = i;
-			va_list L;
-			va_start(L, i);
-			for(unsigned i = 1; i < N; ++i)
-				n[i] = va_arg(L, size_t);
-			
-			va_end(L);
-			
-			nvectorNd_helper<T,N>::init(value, &n[0]);
+			check_ind(ind...);
+			nvectorNd_helper<T,N>::init(value, ind...);
 		}
 		
 		template<typename... Ind>
-		inline T_reference operator()       (Ind... ind) noexcept
+		inline typename std::vector<T>::reference operator()(Ind... ind) noexcept
 		{
 			check_ind(ind...);
 			return nvectorNd_helper<T,N>::elem(value, ind...);
 		}
 		template<typename... Ind>
-		inline T_const_reference operator() (Ind... ind) const noexcept
+		inline typename std::vector<T>::const_reference operator() (Ind... ind) const noexcept
 		{
 			check_ind(ind...);
 			return nvectorNd_helper<T,N>::elem(value, ind...);
 		}
 		template<typename... Ind>
-		inline T_reference at               (Ind... ind)
+		inline typename std::vector<T>::reference at(Ind... ind)
 		{
 			check_ind(ind...);
 			return nvectorNd_helper<T,N>::at(value, ind...);
 		}
 		template<typename... Ind>
-		inline T_const_reference at         (Ind... ind) const
+		inline typename std::vector<T>::const_reference at(Ind... ind) const
 		{
 			check_ind(ind...);
 			return nvectorNd_helper<T,N>::at(value, ind...);
