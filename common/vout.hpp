@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <array>
 
 namespace LW {
 
@@ -23,6 +24,30 @@ template<class T> std::ostream& operator<<(std::ostream& os, const std::vector<T
 	{
 		os<< v.front();
 		for(typename std::vector<T>::const_iterator p = v.begin() + 1; p != v.end(); ++p)
+			os << ' ' << *p;
+	}
+	// os << '\n';
+	return os;
+}
+
+template<class T, std::size_t N >
+void vout(std::ostream& os, const std::array<T,N>& v, const std::string& seperator=" ")
+{
+	if(! v.empty())
+	{
+		os<< v.front();
+		for(typename std::array<T,N>::const_iterator p = v.begin() + 1; p != v.end(); ++p)
+			os << seperator << *p;
+	}
+}
+
+template<class T, std::size_t N >
+std::ostream& operator<<(std::ostream& os, const std::array<T,N>& v)
+{
+	if(! v.empty())
+	{
+		os<< v.front();
+		for(typename std::array<T,N>::const_iterator p = v.begin() + 1; p != v.end(); ++p)
 			os << ' ' << *p;
 	}
 	// os << '\n';
