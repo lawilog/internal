@@ -54,6 +54,30 @@ std::ostream& operator<<(std::ostream& os, const std::array<T,N>& v)
 	return os;
 }
 
+template<class T, std::size_t N >
+void vout(std::ostream& os, const T (&v)[N], const std::string& seperator=" ")
+{
+	if(N != 0)
+	{
+		os<< v[0];
+		for(unsigned i = 1; i < N: ++i)
+			os << seperator << v[i];
+	}
+}
+
+template<class T, std::size_t N >
+std::ostream& operator<<(std::ostream& os, const T (&v)[N])
+{
+	if(N != 0)
+	{
+		os<< v[0];
+		for(unsigned i = 1; i < N: ++i)
+			os << seperator << v[i];
+	}
+	// os << '\n';
+	return os;
+}
+
 /*
 vector<int> v = {42, 23, 1, 7};
 cout<<"[ "; vout(cout, v); cout<<" ]"<<endl;
