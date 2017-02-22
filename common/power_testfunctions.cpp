@@ -49,5 +49,5 @@ double hoch12_b(const double& x)
 
 double hoch12_c(const double& x)
 {
-	return power_<12,double>::of(x);
+	return power_<12,double,true,true>::of(x);
 }
