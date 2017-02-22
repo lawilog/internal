@@ -28,6 +28,8 @@ case $deskDim in
 	;;
 esac
 
+# xrandr | grep connected | sed -r 's/ ([0-9]+)x([0-9]+)/\nTOKEN \1 \2 /g; s/\+/ /g' | grep TOKEN | sort -n -k4 | awk '{print $2, $3}'
+
 offsetX=0
 offsetY=0
 for(( s=0; s<screen; ++s ))
