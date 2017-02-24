@@ -4,6 +4,7 @@
 #include <vector>
 #include <array>
 #include <numeric>
+#include <unordered_map>
 
 namespace LW {
 
@@ -22,19 +23,29 @@ inline auto sum(const forward_iterator begin, const forward_iterator end)
 template<class T>
 inline T sum(const std::vector<T>& v)
 {
-	return std::accumulate(v.begin(), v.end(), T());
+	return std::accumulate(v.cbegin(), v.cend(), T());
 }
 
 template<class T, std::size_t N >
 inline T sum(const std::array<T,N>& v)
 {
-	return std::accumulate(v.begin(), v.end(), T());
+	return std::accumulate(v.cbegin(), v.cend(), T());
 }
 
 template<typename T, std::size_t N>
-inline size_t sum(const T (&v)[N])
+inline T sum(const T (&v)[N])
 {
     return std::accumulate(v, v+N, T());
+}
+
+template<typename key, typename T>
+inline T sum(const std::unordered_map<key,T>& v)
+{
+  T s = T();
+  for(auto it = v.cbegin(); it != v.cend(); ++it)
+    s += it->second;
+  
+  return s;
 }
 
 }

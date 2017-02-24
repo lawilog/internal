@@ -4,6 +4,7 @@
 #include <array>
 #include <forward_list>
 #include <string>
+#include <unordered_map>
 #include "sum.hpp"
 using namespace std;
 using namespace LW;
@@ -27,7 +28,13 @@ int main(int argc, char** argv)
 	
 	array<double,6> A;
 	A.fill(7);
-	cout<<"sum of std::array : "<< sum(A.begin(), A.end()) <<endl;
+	cout<<"sum of std::array : "<< sum(A) <<endl;
+	
+	unordered_map<string,float> umap;
+	umap.emplace("foo", 1.2);
+	umap.emplace("bar", 10);
+	umap.emplace("yolo", 0.7);
+	cout<<"sum of std::unordered_map : "<< sum(umap) <<endl;
 	
 	forward_list<int> L = {0, 1, 1, 1, 3, 3};
 	L.unique();
