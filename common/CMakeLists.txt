@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 project(common)
 
-add_definitions(-Wall -Wno-unused-local-typedefs -std=c++0x -O2)
+add_definitions(-Wall -Wno-unused-local-typedefs -std=c++11 -g) # -O2
 
 include_directories("/usr/include/eigen3")
 include_directories("$ENV{HOME}/proggen/common")

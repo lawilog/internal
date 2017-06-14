@@ -60,23 +60,24 @@ void vout(std::ostream& os, const T (&v)[N], const std::string& seperator=" ")
 	if(N != 0)
 	{
 		os<< v[0];
-		for(unsigned i = 1; i < N: ++i)
+		for(unsigned i = 1; i < N; ++i)
 			os << seperator << v[i];
 	}
 }
 
+/* the following causes ambiguous overloads for char[] arrays
 template<class T, std::size_t N >
 std::ostream& operator<<(std::ostream& os, const T (&v)[N])
 {
 	if(N != 0)
 	{
 		os<< v[0];
-		for(unsigned i = 1; i < N: ++i)
-			os << seperator << v[i];
+		for(unsigned i = 1; i < N; ++i)
+			os << ' ' << v[i];
 	}
 	// os << '\n';
 	return os;
-}
+}*/
 
 /*
 vector<int> v = {42, 23, 1, 7};

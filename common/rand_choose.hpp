@@ -2,6 +2,7 @@
 #define _LW_RAND_CHOOSE
 
 #include <vector>
+#include <unordered_map>
 #include "RandDistrib.hpp"
 #include "sum.hpp"
 
@@ -69,6 +70,27 @@ class RandChooseSeeded
 			double cumsum = p[0]; // valid, since p is not empty
 			unsigned choice = 0;
 			while(choice < p.size()-1 && r > cumsum) cumsum += p[++choice];
+			return choice;
+		}
+		
+		template<class key, class T>
+		typename std::unordered_map<key,T>::const_iterator operator() (
+			const std::unordered_map<key,T>& p, double sum=1.0)
+		{
+			if(p.empty())
+				throw std::out_of_range("rand_choose: cannot choose from empty unordered_map");
+			
+			if(sum <= 0)
+				sum = LW::sum(p);
+			
+			const double r = sum * rand();
+			auto it = p.cbegin(), choice = it;
+			double cumsum = (it++)->second; // valid, since p is not empty
+			while(it != p.cend() && r > cumsum)
+			{
+				cumsum += it->second;
+				choice = it++;
+			}
 			return choice;
 		}
 };

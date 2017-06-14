@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <unordered_map>
+#include <string>
 #include "rand_choose.hpp"
 #include "vout.hpp"
 using namespace std;
@@ -50,6 +52,18 @@ int main()
 	
 	RandChooseSeeded rand_choose_seeded(1337);
 	cout<<"the same every run: "<< rand_choose_seeded(vector<double>({1, 2, 3}), -1) <<endl;
+	
+	std::unordered_map<std::string,double> x;
+	x.emplace("red",   0.7);
+	x.emplace("green", 0.01);
+	x.emplace("blue",  0.29);
+	// x.emplace("zero",  0);
+	
+	cout<<"30 map choices:";
+	for(int i = 0; i < 30; ++i)
+		cout<<" "<< rand_choose_seeded(x)->first;
+	
+	cout<<endl;
 	
 	try
 	{
