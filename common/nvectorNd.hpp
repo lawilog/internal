@@ -94,6 +94,8 @@ class nvectorNd
 		
 		nvectorNd() {}
 		
+		nvectorNd(const nested_vector& _value) : value(_value) {}
+		
 		template<typename... Ind>
 		nvectorNd(Ind... ind)
 		{
