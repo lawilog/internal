@@ -6,13 +6,21 @@ using namespace std;
 int main()
 {
   struct P {string partei; float prozent;};
-  vector<P> umfragen = { // Thueringen 2019-03-26
-    {"Union", 28},
-    {"Linke", 24},
-    {"AfD", 20},
-    {"SPD", 11},
-    {"Grüne", 8},
-    {"FDP", 5}
+  /* vector<P> umfragen = { // Thueringen 2019-03-26
+    {"Union", 29.5},
+    {"Linke", 9},
+    {"AfD", 13},
+    {"SPD", 17},
+    {"Grüne", 18},
+    {"FDP", 9}
+  }; */
+  vector<P> umfragen = { // Sachsen 2019-06-13
+    {"Union", 24},
+    {"Linke", 16},
+    {"AfD", 25},
+    {"SPD", 7},
+    {"Grüne", 16},
+    {"FDP", 6}
   };
   float sum = 0;
   for(P& p: umfragen)
